@@ -955,9 +955,11 @@ function buildPanel(){
         <input type="number" id="nights" class="form-control" value="4" min="0" step="1" oninput="onNightsChange()">
       </div>
       <div class="form-group">
-        <label class="form-label">환율 (KRW/USD)</label>
+        <label class="form-label">환율 (KRW/USD)
+          <button type="button" onclick="refreshExchangeRate()" title="환율 새로고침" style="border:none;background:none;cursor:pointer;font-size:12px;padding:0;margin-left:4px;vertical-align:middle">🔄</button>
+        </label>
         <input type="number" id="exchange" class="form-control" value="${PRICE.exchange}" step="1" readonly style="background:#f3f4f6;cursor:not-allowed">
-        <div id="exchange-status" style="font-size:10px;color:#888;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+        <div id="exchange-status" style="font-size:11px;color:#888;margin-top:3px;min-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       </div>
       <div class="form-group">
         <label class="form-label">차량·가이드 이용일수</label>
@@ -1770,7 +1772,19 @@ window.refreshExchangeRate = async function(){
       calc();
       return;
     }catch(e2){
-      if(statusEl) statusEl.textContent = '⚠️ 조회 실패 (기본값 적용)';
+      /* 3순위: jsDelivr currency-api (fallback, CORS 허용 CDN) */
+      try{
+        const res3 = await fetch('https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/usd.json');
+        const data3 = await res3.json();
+        const krw3 = data3 && data3.usd && data3.usd.krw;
+        if(!krw3) throw new Error('currency-api 데이터 없음');
+        input.value = Math.round(krw3);
+        if(statusEl) statusEl.textContent = `✅ 실시간 (${hh}:${mm} 기준)`;
+        calc();
+        return;
+      }catch(e3){
+        if(statusEl) statusEl.textContent = `⚠️ 조회 실패 (기본값 ${PRICE.exchange}원 적용, ${hh}:${mm})`;
+      }
     }
   }
 };
