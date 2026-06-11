@@ -955,9 +955,7 @@ function buildPanel(){
         <input type="number" id="nights" class="form-control" value="4" min="0" step="1" oninput="onNightsChange()">
       </div>
       <div class="form-group">
-        <label class="form-label">환율 (KRW/USD)
-          <button type="button" onclick="refreshExchangeRate()" title="환율 새로고침" style="border:none;background:none;cursor:pointer;font-size:12px;padding:0;margin-left:4px;vertical-align:middle">🔄</button>
-        </label>
+        <label class="form-label">환율 (KRW/USD)</label>
         <input type="number" id="exchange" class="form-control" value="${PRICE.exchange}" step="1" readonly style="background:#f3f4f6;cursor:not-allowed">
         <div id="exchange-status" style="font-size:11px;color:#888;margin-top:3px;min-height:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
       </div>
@@ -1489,6 +1487,7 @@ window.showCalculator = function(){
   document.getElementById('itinerary-view').style.display = 'none';
   document.getElementById('calculator-view').style.display = '';
   window.scrollTo(0,0);
+  refreshExchangeRate(); // 계산기 화면 진입 시마다 실시간 환율 재조회
 };
 
 window.startWithPackage = function(){
