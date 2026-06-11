@@ -1,0 +1,1787 @@
+<meta charset="UTF-8">
+<!-- ★ 마이온트래블 발리 자동 견적 시스템 v1.0 ★ -->
+<!-- html2canvas: 결과 이미지 저장용 -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+/* ── 글로벌 리셋: #mot-bali-wrap 내부만 적용 (아임웹 다른 요소에 영향 없음) ── */
+:where(#mot-bali-wrap) *,:where(#mot-bali-wrap) *::before,:where(#mot-bali-wrap) *::after{box-sizing:border-box;margin:0;padding:0}
+#mot-bali-wrap{font-family:'Malgun Gothic','Apple SD Gothic Neo',sans-serif;background:#f0f4f8;color:#2d3748;font-size:15px;line-height:1.6;overflow-x:hidden;max-width:100vw}
+.site-header{background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);color:#fff;padding:14px 24px;display:flex;align-items:center;gap:14px;box-shadow:0 2px 8px rgba(0,0,0,.25)}
+.site-header .logo{font-size:20px;font-weight:900;letter-spacing:-.5px}
+.site-header .sub{font-size:11px;opacity:.8}
+.region-tabs{display:flex;background:#0f5132;padding:0 20px;gap:4px}
+.region-tab{padding:10px 22px;cursor:pointer;color:rgba(255,255,255,.55);font-size:13px;font-weight:700;border-bottom:3px solid transparent;transition:all .2s;user-select:none;white-space:nowrap}
+.region-tab:hover{color:rgba(255,255,255,.9)}
+.region-tab.active{color:#fff;border-bottom-color:#facc15}
+.main-layout{display:grid;grid-template-columns:1fr 360px;gap:14px;padding:14px;max-width:1300px;margin:0 auto}
+/* ── 태블릿 (≤960px): 결과패널 하단 배치 ── */
+@media(max-width:960px){
+  .main-layout{grid-template-columns:1fr}
+  .result-panel{position:static!important}
+}
+/* ── 모바일 (≤768px): 하단 바 + 시트 방식 ── */
+@media(max-width:768px){
+  .site-header{padding:10px 16px}
+  .site-header .logo{font-size:18px}
+  .region-tabs{padding:0 6px;gap:0;overflow-x:auto;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+  .region-tabs::-webkit-scrollbar{display:none}
+  .region-tab{padding:11px 15px;font-size:13px;flex-shrink:0}
+  .main-layout{padding:10px;gap:10px;padding-bottom:86px}
+  .result-panel{display:none}               /* 하단 시트로 대체 */
+  #mot-bali-wrap .card-body{padding:11px 13px}
+  #mot-bali-wrap .form-row{grid-template-columns:1fr 1fr;gap:8px}
+  #mot-bali-wrap .form-control{padding:11px 12px;font-size:15px}
+  .option-grid{grid-template-columns:1fr}
+  .dual-hotel{grid-template-columns:1fr}
+  .hotel-item,.option-item{padding:11px 13px}
+  .subsection-title{font-size:13px}
+}
+@media(max-width:400px){
+  #mot-bali-wrap .form-row{grid-template-columns:1fr}
+  .region-tab{padding:10px 11px;font-size:12px}
+}
+/* ── 모바일 하단 바 ── */
+.mobile-bar{
+  display:none;position:fixed;bottom:0;left:0;right:0;
+  background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);
+  color:#fff;padding:12px 16px;
+  padding-bottom:calc(12px + env(safe-area-inset-bottom,0px));
+  z-index:500;box-shadow:0 -3px 16px rgba(0,0,0,.25);
+  cursor:pointer;align-items:center;gap:12px
+}
+.mobile-bar-text{flex:1;min-width:0}
+.mobile-bar-label{font-size:11px;opacity:.75;margin-bottom:2px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mobile-bar-price{font-size:22px;font-weight:900;letter-spacing:-1px}
+.mobile-bar-btn{background:#facc15;color:#0f5132;border:none;border-radius:8px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
+@media(max-width:768px){.mobile-bar{display:flex!important}}
+/* ── 시트 오버레이 ── */
+.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:590}
+.sheet-overlay.open{display:block}
+/* ── result-panel 시트 모드 (모바일에서 열릴 때) ── */
+@media(max-width:768px){
+  .result-panel.sheet-open{
+    display:block!important;position:fixed!important;
+    bottom:0;left:0;right:0;max-height:88vh;overflow-y:auto;
+    border-radius:16px 16px 0 0;z-index:600;
+    box-shadow:0 -4px 30px rgba(0,0,0,.3);margin:0;
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+}
+/* ── 시트 드래그 핸들 (모바일 전용) ── */
+.sheet-drag-bar{display:none;padding:12px 16px 8px;position:sticky;top:0;background:#fff;z-index:1;border-bottom:1px solid #f3f4f6;align-items:center;justify-content:space-between}
+@media(max-width:768px){.sheet-drag-bar{display:flex}}
+.sheet-handle{width:36px;height:4px;background:#e2e8f0;border-radius:2px}
+.sheet-close-btn{background:none;border:none;font-size:20px;color:#718096;cursor:pointer;padding:4px;line-height:1}
+#mot-bali-wrap .card{background:#fff;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.1);margin-bottom:12px;overflow:hidden}
+#mot-bali-wrap .card-header{background:#f7f9fc;padding:9px 16px;font-weight:700;font-size:12px;color:#0f5132;border-bottom:1px solid #e8edf4;display:flex;align-items:center;gap:6px}
+#mot-bali-wrap .card-body{padding:12px 16px}
+#mot-bali-wrap .form-row{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:10px;margin-bottom:10px;min-width:0}
+#mot-bali-wrap .form-group{display:flex;flex-direction:column;gap:3px;min-width:0}
+#mot-bali-wrap .form-label{font-size:11px;color:#718096;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+#mot-bali-wrap .form-control{height:43px;padding:9px 11px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:14px;font-family:inherit;transition:border-color .2s;background:#fff;width:100%;min-width:0;max-width:100%}
+#mot-bali-wrap .form-control:focus{outline:none;border-color:#15803d}
+#mot-bali-wrap .form-control[type="number"]{text-align:right}
+#mot-bali-wrap .form-control:disabled{background:#f7f9fc;color:#718096;cursor:not-allowed;opacity:.85}
+#mot-bali-wrap select.form-control{
+  text-align:left;
+  font-size:13px;
+  font-weight:600;
+  color:#2d3748;
+  -webkit-appearance:none;
+  -moz-appearance:none;
+  appearance:none;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2315803d' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat:no-repeat;
+  background-position:right 10px center;
+  background-size:14px;
+  height:43px;
+  padding-top:0;
+  padding-bottom:0;
+  padding-right:30px;
+  line-height:40px;
+  text-overflow:ellipsis;
+  white-space:nowrap;
+  overflow:hidden;
+}
+.option-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:6px}
+.option-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1.5px solid #e2e8f0;border-radius:7px;cursor:pointer;transition:all .15s;user-select:none}
+.option-item:hover{border-color:#86efac;background:#f0fdf4}
+.option-item.selected{border-color:#15803d;background:#ecfdf5}
+.option-item.mot-fixed{border-color:#9ae6b4;background:#f0fff4;cursor:default}
+.option-item input{margin-top:2px;accent-color:#15803d;flex-shrink:0}
+.option-label{display:flex;flex-direction:column;gap:2px}
+.option-name{font-size:14px;font-weight:600;color:#2d3748;line-height:1.4}
+.option-price{font-size:11px;color:#15803d;font-weight:700}
+.option-note{font-size:10px;color:#a0aec0}
+.subsection{margin-bottom:14px}
+.subsection-title{font-size:12px;font-weight:700;color:#4a5568;margin-bottom:8px;padding-left:6px;border-left:3px solid #15803d}
+.hotel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:8px}
+.hotel-item{display:flex;align-items:flex-start;gap:8px;padding:10px 12px;border:1.5px solid #e2e8f0;border-radius:8px;cursor:pointer;transition:all .15s;user-select:none}
+.hotel-item:hover{border-color:#86efac;background:#f0fdf4}
+.hotel-item.selected{border-color:#15803d;background:#ecfdf5}
+.hotel-item input{margin-top:3px;accent-color:#15803d;flex-shrink:0}
+.hotel-name{font-size:13px;font-weight:700;color:#0f5132;line-height:1.3}
+.hotel-sub{font-size:11px;color:#718096}
+.hotel-upgrade-note{font-size:10px;color:#c05621;margin-top:2px}
+.result-panel{position:sticky;top:14px;height:fit-content}
+.result-card{background:#fff;border-radius:10px;box-shadow:0 2px 12px rgba(0,0,0,.12);overflow:hidden}
+.result-header{background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);color:#fff;padding:12px 16px;font-size:13px;font-weight:700}
+.result-body{padding:14px}
+.result-table{width:100%;border-collapse:collapse;margin-bottom:12px}
+.result-table th{font-size:10px;color:#718096;font-weight:700;padding:4px 6px;text-align:right;border-bottom:1px solid #e8edf4}
+.result-table th:first-child{text-align:left}
+.result-table td{padding:6px 7px;font-size:13px;border-bottom:1px solid #f3f4f6}
+.result-table td:first-child{color:#4a5568;font-weight:500}
+.result-table td.usd-col{text-align:right;color:#718096;font-size:11px}
+.result-table td.krw-col{text-align:right;font-weight:600;color:#0f5132}
+.result-table td.zero{color:#cbd5e0!important;font-weight:400!important}
+.total-box{background:#ecfdf5;border-radius:8px;padding:12px;margin-bottom:10px}
+.total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px}
+.total-row:last-child{margin-bottom:0}
+.total-label{font-size:12px;color:#4a5568}
+.total-value{font-size:13px;font-weight:700;color:#0f5132}
+.total-value.depart-val{font-size:12px;font-weight:600}
+.fee-row{display:flex;align-items:center;gap:8px;padding:10px 0 4px;border-top:1px solid #e8edf4;margin-top:8px}
+.fee-label{font-size:12px;color:#4a5568;flex:1}
+.fee-input{width:120px;padding:5px 8px;border:1.5px solid #e2e8f0;border-radius:6px;font-size:13px;text-align:right;font-family:inherit}
+.fee-input:disabled{background:#f7f9fc;color:#718096;cursor:not-allowed}
+.fee-unit{font-size:11px;color:#718096}
+.insurance-note{font-size:10px;color:#805ad5;padding:0 0 8px;margin-top:2px}
+.selling-box{background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);border-radius:8px;padding:12px;margin:10px 0;color:#fff}
+.selling-title{font-size:11px;opacity:.8;margin-bottom:3px}
+.selling-price{font-size:24px;font-weight:900;letter-spacing:-1px}
+.selling-sub{font-size:10px;opacity:.8;margin-top:3px}
+#mot-bali-wrap .badge{display:inline-block;background:#facc15;color:#0f5132;border-radius:4px;padding:2px 8px;font-size:11px;font-weight:700;margin-top:3px}
+#mot-bali-wrap .btn{padding:8px 14px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;border:none;transition:all .15s;font-family:inherit;display:block;width:100%;text-align:center;margin-bottom:7px}
+#mot-bali-wrap .btn-outline{background:#fff;color:#15803d;border:2px solid #15803d}
+#mot-bali-wrap .btn-outline:hover{background:#ecfdf5}
+#mot-bali-wrap .btn-primary{background:#15803d;color:#fff}
+#mot-bali-wrap .btn-primary:hover{background:#0f5132}
+.vehicle-info{background:#fffbeb;border:1px solid #fcd34d;border-radius:6px;padding:7px 12px;font-size:11px;color:#92400e;margin-top:6px}
+.dual-hotel{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:640px){.dual-hotel{grid-template-columns:1fr}}
+.dual-hotel .form-row{margin-bottom:14px}
+.hotel-section-label{font-size:12px;font-weight:700;color:#0f5132;margin-bottom:10px;padding:6px 8px;background:#ecfdf5;border-radius:5px}
+.mot-fixed-badge{font-size:10px;color:#276749;background:#c6f6d5;border-radius:3px;padding:1px 6px;margin-left:4px}
+/* ── 접이식 그룹 ── */
+#mot-bali-wrap details.item-group{border:1px solid #e8edf4;border-radius:8px;margin-bottom:8px;overflow:hidden}
+#mot-bali-wrap details.item-group summary{padding:9px 12px;font-size:12px;font-weight:700;color:#0f5132;background:#f7f9fc;cursor:pointer;user-select:none;list-style:none}
+#mot-bali-wrap details.item-group summary::-webkit-details-marker{display:none}
+#mot-bali-wrap details.item-group summary::before{content:'▶ ';font-size:10px;color:#15803d}
+#mot-bali-wrap details.item-group[open] summary::before{content:'▼ '}
+#mot-bali-wrap details.item-group .item-group-body{padding:10px}
+.meal-row{display:flex;align-items:center;gap:8px;padding:6px 10px;border:1.5px solid #e2e8f0;border-radius:7px;margin-bottom:5px;transition:all .15s}
+.meal-row.selected{border-color:#15803d;background:#ecfdf5}
+.meal-row .meal-name{font-size:13px;font-weight:600;color:#2d3748}
+.meal-selected-empty{font-size:12px;color:#a0aec0;padding:10px;border:1.5px dashed #e2e8f0;border-radius:7px;text-align:center;margin-bottom:8px}
+#meal-selected-list:empty{display:none}
+.meal-row .meal-price{font-size:11px;color:#15803d;margin-left:6px;font-weight:700}
+.meal-ctrl{display:flex;align-items:center;gap:5px}
+.meal-btn{width:22px;height:22px;border-radius:50%;border:1.5px solid #e2e8f0;background:#f7f9fc;cursor:pointer;font-size:13px;line-height:1}
+/* ── 인쇄 미리보기 모달 ── */
+#print-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);
+  z-index:10000;overflow-y:auto;padding:16px;
+}
+.print-modal{
+  background:#fff;max-width:520px;margin:0 auto;
+  border-radius:12px;overflow:hidden;
+  box-shadow:0 20px 60px rgba(0,0,0,.35)
+}
+.print-modal-header{
+  background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);
+  color:#fff;padding:14px 18px;
+  display:flex;justify-content:space-between;align-items:center
+}
+.print-modal-header h2{font-size:14px;font-weight:700;margin:0}
+.print-modal-close{
+  background:none;border:none;color:#fff;font-size:18px;
+  cursor:pointer;padding:0 4px;line-height:1
+}
+#print-content{padding:18px}
+.pq-divider{border:none;border-top:1px dashed #e2e8f0;margin:10px 0}
+.pq-meta{background:#f7f9fc;border-radius:8px;padding:10px 14px;margin-bottom:12px;font-size:12px;line-height:2}
+.pq-meta strong{color:#0f5132}
+.pq-table{width:100%;border-collapse:collapse;margin-bottom:12px;font-size:12px}
+.pq-table th{background:#f7f9fc;padding:5px 8px;text-align:right;color:#718096;font-weight:700;font-size:11px}
+.pq-table th:first-child{text-align:left}
+.pq-table td{padding:5px 8px;border-bottom:1px solid #f3f4f6}
+.pq-table td:first-child{color:#4a5568}
+.pq-table td.r{text-align:right}
+.pq-table td.bold{font-weight:700;color:#0f5132}
+.pq-total-box{background:#ecfdf5;border-radius:8px;padding:12px 14px;margin-bottom:12px;font-size:12px}
+.pq-sell-box{background:linear-gradient(135deg,#0f5132,#15803d);color:#fff;border-radius:8px;padding:12px 14px;margin-bottom:12px}
+.pq-sell-label{font-size:10px;opacity:.8}
+.pq-sell-price{font-size:22px;font-weight:900;letter-spacing:-1px}
+.pq-notes{font-size:10px;color:#a0aec0;line-height:1.8}
+.print-actions{
+  padding:14px 18px;display:flex;gap:8px;
+  border-top:1px solid #e8edf4;justify-content:flex-end
+}
+.btn-print-go{
+  padding:8px 20px;background:#15803d;color:#fff;
+  border:none;border-radius:7px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit
+}
+.btn-print-go:hover{background:#0f5132}
+.btn-img-save{
+  padding:8px 16px;background:#805ad5;color:#fff;
+  border:none;border-radius:7px;font-size:13px;font-weight:700;
+  cursor:pointer;font-family:inherit
+}
+.btn-img-save:hover{background:#6b46c1}
+.btn-print-close{
+  padding:8px 16px;background:#f7f9fc;color:#4a5568;
+  border:1.5px solid #e2e8f0;border-radius:7px;font-size:13px;
+  font-weight:600;cursor:pointer;font-family:inherit
+}
+/* ── 인쇄 CSS ── */
+@media print{
+  body *{visibility:hidden}
+  #print-overlay,#print-overlay *{visibility:visible}
+  #print-overlay{
+    position:absolute!important;top:0;left:0;
+    background:none!important;padding:0!important;
+    overflow:visible!important
+  }
+  .print-modal{box-shadow:none!important;max-width:100%!important;border-radius:0!important}
+  .print-modal-header{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .print-actions{display:none!important}
+  .pq-sell-box{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+/* ════════════════════════════════════════════════════════════
+   v2: 패키지 선택 / 일정표 화면
+   ════════════════════════════════════════════════════════════ */
+.pkg-view{max-width:1100px;margin:0 auto;padding:20px 16px 50px}
+.pkg-view-header{text-align:center;margin-bottom:22px}
+.pkg-view-title{font-size:22px;font-weight:900;color:#0f5132;margin-bottom:6px}
+.pkg-view-sub{font-size:13px;color:#718096}
+.package-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:16px}
+.package-card{background:#fff;border-radius:14px;box-shadow:0 2px 10px rgba(0,0,0,.08);overflow:hidden;display:flex;flex-direction:column;border:2px solid transparent;transition:all .15s;cursor:pointer}
+.package-card:hover{border-color:#15803d;transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,81,50,.15)}
+.package-card-top{background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);color:#fff;padding:16px 18px}
+.package-card-badge{display:inline-block;background:#facc15;color:#0f5132;font-size:11px;font-weight:800;border-radius:20px;padding:3px 10px;margin-bottom:8px}
+.package-card-title{font-size:18px;font-weight:900;letter-spacing:-.3px}
+.package-card-sub{font-size:12px;opacity:.85;margin-top:4px;line-height:1.5}
+.package-card-body{padding:14px 18px;flex:1;display:flex;flex-direction:column;gap:8px}
+.package-card-meta{display:flex;gap:8px;font-size:11px;color:#15803d;font-weight:700}
+.package-card-meta span{background:#ecfdf5;border-radius:6px;padding:3px 8px}
+.package-highlights{list-style:none;display:flex;flex-direction:column;gap:4px;font-size:12.5px;color:#4a5568}
+.package-highlights li::before{content:'✓ ';color:#15803d;font-weight:900}
+.package-card-cta{margin-top:auto;background:#15803d;color:#fff;text-align:center;font-weight:800;font-size:13px;padding:10px;border-radius:8px}
+.pkg-view-footer{text-align:center;margin-top:22px}
+.pkg-view-footer .btn{display:inline-block;width:auto;padding:11px 22px}
+/* ── 일정표 화면 ── */
+.itinerary-header{background:linear-gradient(135deg,#0f5132 0%,#15803d 100%);color:#fff;border-radius:14px;padding:18px 20px;margin-bottom:18px}
+.itinerary-header .badge2{display:inline-block;background:#facc15;color:#0f5132;font-size:11px;font-weight:800;border-radius:20px;padding:3px 10px;margin-bottom:8px}
+.itinerary-header h2{font-size:20px;font-weight:900;margin-bottom:4px}
+.itinerary-header .sub{font-size:12.5px;opacity:.85}
+.itinerary-days{display:flex;flex-direction:column;gap:12px}
+.day-card{background:#fff;border-radius:12px;box-shadow:0 1px 4px rgba(0,0,0,.08);overflow:hidden;display:grid;grid-template-columns:64px 1fr}
+.day-num{background:#0f5132;color:#fff;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:900;padding:10px 4px}
+.day-num .d-label{font-size:10px;opacity:.75}
+.day-num .d-num{font-size:22px;line-height:1}
+.day-body{padding:12px 16px}
+.day-title-row{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.day-title{font-size:15px;font-weight:800;color:#0f5132}
+.day-hotel{font-size:11px;font-weight:700;color:#92400e;background:#fef3c7;border-radius:6px;padding:2px 8px;white-space:nowrap}
+.day-items{list-style:none;font-size:13px;color:#4a5568;line-height:1.7;margin-bottom:8px}
+.day-items li::before{content:'• ';color:#15803d}
+.day-meals{display:flex;gap:6px;flex-wrap:wrap}
+.day-meals span{font-size:11px;background:#f7f9fc;border:1px solid #e8edf4;border-radius:6px;padding:3px 8px;color:#4a5568}
+.day-meals b{color:#0f5132}
+.itinerary-actions{display:flex;gap:10px;margin-top:20px;flex-wrap:wrap}
+.itinerary-actions .btn{flex:1;min-width:160px;padding:13px;font-size:14px}
+@media(max-width:600px){
+  .day-card{grid-template-columns:48px 1fr}
+  .pkg-view{padding:14px 10px 40px}
+}
+</style>
+<!-- 아임웹 격리 래퍼: 이 ID 안에서만 리셋/스타일 적용 -->
+<div id="mot-bali-wrap">
+
+<header class="site-header">
+  <div>
+    <div class="logo">🌴 MYOWNTRAVEL</div>
+    <div class="sub">발리 자동 견적 시스템 v2.0</div>
+  </div>
+</header>
+
+<!-- ① 패키지(일정) 선택 화면 -->
+<div id="package-view" class="pkg-view">
+  <div class="pkg-view-header">
+    <div class="pkg-view-title">🌴 어떤 일정으로 떠나시나요?</div>
+    <div class="pkg-view-sub">원하시는 일정을 선택하시면 상세 일정표를 보여드리고, 견적 계산기에 자동으로 반영해 드립니다.</div>
+  </div>
+  <div class="package-grid" id="package-list"></div>
+  <div class="pkg-view-footer">
+    <button class="btn btn-outline" onclick="showCalculator()">🧮 패키지 없이 직접 계산기 입력하기 →</button>
+  </div>
+</div>
+
+<!-- ② 일정표 미리보기 화면 -->
+<div id="itinerary-view" class="pkg-view" style="display:none">
+  <div class="itinerary-header" id="itinerary-header"></div>
+  <div class="itinerary-days" id="itinerary-days"></div>
+  <div class="itinerary-actions">
+    <button class="btn btn-outline" onclick="backToPackages()">← 다른 일정 보기</button>
+    <button class="btn btn-primary" onclick="startWithPackage()">✅ 이 일정으로 견적 시작하기</button>
+  </div>
+</div>
+
+<!-- ③ 계산기 화면 -->
+<div id="calculator-view" style="display:none">
+
+<div class="region-tabs">
+  <div class="region-tab active" onclick="switchTripType('honeymoon')">💑 허니문</div>
+  <div class="region-tab"        onclick="switchTripType('family')">👨‍👩‍👧‍👦 가족/일반여행</div>
+</div>
+<div style="max-width:1300px;margin:0 auto;padding:8px 14px 0">
+  <button class="btn btn-outline" style="width:auto;display:inline-block;padding:8px 16px;margin:0" onclick="backToPackages()">← 일정 선택으로 돌아가기</button>
+</div>
+
+<div class="main-layout">
+  <div class="input-panel" id="input-panel"></div>
+
+  <!-- 실시간 견적 결과 패널 -->
+  <div class="result-panel">
+    <div class="result-card">
+      <!-- 모바일 시트 핸들 (desktop에서는 CSS로 숨김) -->
+      <div class="sheet-drag-bar">
+        <div class="sheet-handle"></div>
+        <span style="font-size:13px;font-weight:700;color:#0f5132">💰 실시간 견적</span>
+        <button class="sheet-close-btn" onclick="closeSheet()">✕</button>
+      </div>
+      <div class="result-header">
+        💰 실시간 견적 결과
+        <div style="font-size:11px;font-weight:400;opacity:.8;margin-top:2px" id="result-subtitle">입력값을 수정하면 자동 계산됩니다</div>
+      </div>
+      <div class="result-body">
+        <table class="result-table">
+          <thead><tr><th>항목</th><th>USD</th><th>원화</th></tr></thead>
+          <tbody id="result-rows"></tbody>
+        </table>
+        <div class="total-box">
+          <div class="total-row"><span class="total-label">총 지상비 (USD)</span><span class="total-value" id="r-total-usd">$0</span></div>
+          <div class="total-row"><span class="total-label">총 지상비 (원화)</span><span class="total-value" id="r-total-krw">₩0</span></div>
+          <div class="total-row"><span class="total-label">1인당 원가 (원화)</span><span class="total-value" id="r-per-krw">₩0</span></div>
+          <div class="total-row"><span class="total-label">여행사수수료 (1인당)</span><span class="total-value" id="r-margin">₩0</span></div>
+        </div>
+        <div class="selling-box">
+          <div class="selling-title">1인당 판매가 (지상비, 5천원 단위 올림)</div>
+          <div class="selling-price" id="r-selling">₩0</div>
+          <div class="selling-sub" id="r-selling-sub">= 1인당원가 + 여행사수수료</div>
+          <div class="badge" id="r-badge">0명 기준</div>
+        </div>
+        <div class="total-box" id="air-box">
+          <div class="total-row"><span class="total-label">✈️ 항공료 (1인, 직접입력)</span><span class="total-value" id="r-air-per">₩0</span></div>
+          <div class="total-row"><span class="total-label">✈️ 항공료 합계</span><span class="total-value" id="r-air-total">₩0</span></div>
+        </div>
+        <div class="selling-box" style="background:linear-gradient(135deg,#92400e,#facc15);">
+          <div class="selling-title">총 판매가 (지상비+항공료, 인원 전체)</div>
+          <div class="selling-price" id="r-grand-total">₩0</div>
+          <div class="selling-sub" id="r-grand-sub">= 1인당 판매가 × 인원 + 항공료</div>
+        </div>
+        <button class="btn btn-outline" onclick="showPrintPreview()">🖨 견적서 미리보기 / 인쇄</button>
+        <button class="btn btn-primary" onclick="copyResult()">📋 결과 복사</button>
+        <button class="btn" style="background:#805ad5;color:#fff" onclick="saveAsImage()">📸 이미지 저장</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 모바일 하단 바 -->
+<div class="sheet-overlay" id="sheet-overlay" onclick="closeSheet()"></div>
+<div class="mobile-bar" id="mobile-bar" onclick="openSheet()">
+  <div class="mobile-bar-text">
+    <div class="mobile-bar-label" id="mb-label">견적을 입력하세요</div>
+    <div class="mobile-bar-price" id="mb-price">₩0 /인</div>
+  </div>
+  <button class="mobile-bar-btn">견적 보기 ↑</button>
+</div>
+
+</div><!-- /#calculator-view -->
+
+<!-- 인쇄 미리보기 모달 -->
+<div id="print-overlay" onclick="if(event.target===this)closePrintPreview()">
+  <div class="print-modal">
+    <div class="print-modal-header">
+      <h2>🖨 마이온트래블 발리 견적서 미리보기</h2>
+      <button class="print-modal-close" onclick="closePrintPreview()">✕</button>
+    </div>
+    <div id="print-content"></div>
+    <div class="print-actions">
+      <button class="btn-img-save" onclick="closePrintPreview();saveAsImage()">📸 이미지 저장</button>
+      <button class="btn-print-go" onclick="doPrint()">🖨 인쇄하기</button>
+      <button class="btn-print-close" onclick="closePrintPreview()">닫기</button>
+    </div>
+  </div>
+</div>
+</div><!-- /#mot-bali-wrap -->
+
+<script>
+(function(){
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   원가 데이터 (구글시트 ①~⑦ 발리원가 기준, 2026-06-10 확정)
+   ════════════════════════════════════════════════════════════ */
+const PRICE = {
+  exchange: 1480, // 기본 환율 (편집 가능)
+
+  /* ⑦ 호텔 (33개, 2인1실 BB 기준, 비수기/성수기 USD) ───────────── */
+  hotels: [
+    {id:'h01',region:'꾸따·레기안',name:'하드락 호텔 발리',sub:'Superior',cap:2,price:{low:144,high:176}},
+    {id:'h02',region:'꾸따·레기안',name:'하드락 호텔 발리',sub:'Deluxe Pool View',cap:2,price:{low:176,high:208}},
+    {id:'h03',region:'꾸따·레기안',name:'꾸따비치 헤리티지',sub:'Superior',cap:2,price:{low:128,high:160}},
+    {id:'h04',region:'꾸따·레기안',name:'디스커버리 카르티카 플라자',sub:'Superior',cap:2,price:{low:96,high:128}},
+    {id:'h05',region:'꾸따·레기안',name:'라마야나 리조트',sub:'Deluxe',cap:2,price:{low:64,high:80}},
+    {id:'h06',region:'꾸따·레기안',name:'꾸따 팔라스 헤리티지',sub:'Standard',cap:2,price:{low:48,high:64}},
+    {id:'h07',region:'꾸따·레기안',name:'팝스 호텔 꾸따',sub:'Standard',cap:2,price:{low:40,high:52}},
+    {id:'h08',region:'꾸따·레기안',name:'아스타나 산티 리조트',sub:'Standard',cap:2,price:{low:48,high:60}},
+    {id:'h09',region:'누사두아',name:'웨스틴 리조트 발리',sub:'Deluxe',cap:2,price:{low:224,high:288}},
+    {id:'h10',region:'누사두아',name:'메리어트 발리 누사두아',sub:'Deluxe',cap:2,price:{low:208,high:256}},
+    {id:'h11',region:'누사두아',name:'샹그릴라 라사 사양',sub:'Deluxe',cap:2,price:{low:240,high:304}},
+    {id:'h12',region:'누사두아',name:'힐튼 발리 리조트',sub:'Deluxe Ocean',cap:2,price:{low:192,high:240}},
+    {id:'h13',region:'누사두아',name:'아마누사',sub:'Suite',cap:2,price:{low:400,high:480}},
+    {id:'h14',region:'누사두아',name:'메리아 발리',sub:'Standard',cap:2,price:{low:144,high:176}},
+    {id:'h15',region:'누사두아',name:'더 그랜드 호텔 발리',sub:'Standard',cap:2,price:{low:96,high:120}},
+    {id:'h16',region:'누사두아',name:'사우스 스퀘어 호텔',sub:'Standard',cap:2,price:{low:80,high:104}},
+    {id:'h17',region:'스미냑·짱구',name:'더블유 발리 스미냑',sub:'Marvelous Suite',cap:2,price:{low:320,high:400}},
+    {id:'h18',region:'스미냑·짱구',name:'알라야 리조트 스미냑',sub:'Deluxe',cap:2,price:{low:192,high:240}},
+    {id:'h19',region:'스미냑·짱구',name:'아난타라 스미냑',sub:'Deluxe',cap:2,price:{low:224,high:272}},
+    {id:'h20',region:'스미냑·짱구',name:'더 레이아우 발리',sub:'Villa',cap:2,price:{low:240,high:288}},
+    {id:'h21',region:'스미냑·짱구',name:'쿠 드 따 스미냑',sub:'Deluxe',cap:2,price:{low:128,high:160}},
+    {id:'h22',region:'스미냑·짱구',name:'더 비치 하우스 짱구',sub:'Standard',cap:2,price:{low:112,high:144}},
+    {id:'h23',region:'우붓',name:'포시즌스 리조트 우붓',sub:'Suite',cap:2,price:{low:480,high:640}},
+    {id:'h24',region:'우붓',name:'아야나 리조트 우붓 (Sayan)',sub:'Deluxe',cap:2,price:{low:280,high:360}},
+    {id:'h25',region:'우붓',name:'알라야 리조트 우붓',sub:'Deluxe',cap:2,price:{low:160,high:208}},
+    {id:'h26',region:'우붓',name:'코마네카 앳 비사마',sub:'Suite',cap:2,price:{low:320,high:400}},
+    {id:'h27',region:'우붓',name:'카펠라 우붓',sub:'Tent',cap:2,price:{low:640,high:800}},
+    {id:'h28',region:'우붓',name:'코코 우붓 리조트',sub:'Standard',cap:2,price:{low:112,high:144}},
+    {id:'h29',region:'우붓',name:'더 로얄 피타마하',sub:'Deluxe',cap:2,price:{low:144,high:192}},
+    {id:'h30',region:'우붓',name:'보다 발리 우붓',sub:'Standard',cap:2,price:{low:64,high:80}},
+    {id:'h31',region:'기타(로비나·탄조크아멧)',name:'더 파라다이스 리조트 로비나',sub:'Deluxe',cap:2,price:{low:80,high:104}},
+    {id:'h32',region:'기타(로비나·탄조크아멧)',name:'다마이 로비나 빌라',sub:'Villa',cap:2,price:{low:240,high:304}},
+    {id:'h33',region:'기타(로비나·탄조크아멧)',name:'워터블로우 리조트',sub:'Standard',cap:2,price:{low:56,high:72}},
+    /* ── v2 패키지 전용 추가 호텔 (코리아트래블 요금표 기준, 2026 확정 일정 매칭) ── */
+    {id:'h34',region:'짐바란',name:'림바 짐바란 바이 아야나 리조트',sub:'Resort View Room (조식포함)',cap:2,price:{low:169.08,high:194.89}},
+    {id:'h35',region:'우붓',name:'더 카욘정글 리조트',sub:'Jungle Pool Villa',cap:2,price:{low:545.8,high:595.8}},
+    {id:'h36',region:'누사두아',name:'더 아푸르바 켐핀스키 발리 리조트',sub:'Cliff Private Pool Junior Suite (풀빌라)',cap:2,price:{low:600,high:675}},
+    {id:'h99',region:'기타',name:'기타 호텔 (직접입력)',sub:'1박 1실 단가(USD) 직접 입력 — 림바짐바란/카욘정글 등',cap:2,price:{low:0,high:0},custom:true},
+  ],
+
+  /* ⑤ 차량비 — 인원수별 자동배정 (1일 차터 기준, USD/일) ───────── */
+  vehicle: [
+    {max:6,   type:'APV (소형, 1~6명)',        rate:46.7},
+    {max:10,  type:'HIACE (중형, 7~10명)',     rate:63.3},
+    {max:25,  type:'25인승 버스 (11~25명)',    rate:86.7},
+    {max:35,  type:'35인승 버스 (26~35명)',    rate:113.3},
+    {max:999, type:'45인승 버스 (36명 이상)',  rate:133.3},
+  ],
+
+  /* ⑥ 가이드비 (USD/일) + 인원수별 자동배정 ───────────────────── */
+  guide: [
+    {id:'g01',name:'한국어 가이드 - 풀데이(8H)',price:80.0},
+    {id:'g02',name:'한국어 가이드 - 하프데이(4H)',price:50.0},
+    {id:'g03',name:'영어 가이드 - 풀데이(8H)',price:60.0},
+    {id:'g04',name:'로컬 가이드 - 풀데이(8H)',price:40.0},
+  ],
+  guideAssign: [{max:15,count:1},{max:30,count:2},{max:999,count:3}],
+
+  /* ① 식당 (71개, 1인 단가 USD, 단위 기본 '인') ───────────────── */
+  meals: [
+    {group:'꾸따·누사두아·레기안', items:[
+      {id:'m01',name:'강남(Gangnam) 비빔밥',price:6.0},
+      {id:'m02',name:'강남(Gangnam) 무한삼겹',price:13.3},
+      {id:'m03',name:'코피발리하우스 Set Menu D (Italian)',price:8.3},
+      {id:'m04',name:'코피발리하우스 Set Menu G (Nasi Goreng)',price:7.7},
+      {id:'m05',name:'코피발리하우스 Set Menu H (Nasi Rendang)',price:9.0},
+      {id:'m06',name:'꼬끼 누사두아 Korean Food',price:6.7},
+      {id:'m07',name:'탈리스만 Indonesian Food',price:6.7},
+      {id:'m08',name:'탈리스만 Pork Ribs',price:5.7},
+      {id:'m09',name:'켑켑 Package A (Nasi Goreng)',price:5.3},
+      {id:'m10',name:'켑켑 Chicken Sate Set',price:7.3},
+      {id:'m11',name:'켑켑 Nasi Goreng + Chicken Sate',price:6.7},
+      {id:'m12',name:'발레우당 꾸따 Paket Palemahan 3',price:10.0},
+      {id:'m13',name:'발레우당 꾸따 Paket Pawongan 1',price:12.0},
+      {id:'m14',name:'로카씨하우스 Lunch A',price:6.7},
+      {id:'m15',name:'로카씨하우스 Lunch B',price:10.0},
+      {id:'m16',name:'로카씨하우스 Lunch C',price:16.7},
+      {id:'m17',name:'루스터피쉬 Pizza+Fries+Drink',price:16.7,note:'판다와비치 입장료 별도'},
+      {id:'m18',name:'빤딴사리 씨푸드 500g',price:16.7},
+      {id:'m19',name:'빤딴사리 씨푸드 700g',price:23.3},
+      {id:'m20',name:'싱글핀 Burger+Pasta+Salad+Drink',price:22.0,note:'비치클럽'},
+      {id:'m21',name:'물리아 호텔뷔페 Buffet Lunch (성인)',price:33.3},
+      {id:'m22',name:'물리아 호텔뷔페 Buffet Lunch (아동)',price:17.3},
+      {id:'m23',name:'물리아 호텔뷔페 Buffet Dinner (성인)',price:39.3},
+      {id:'m24',name:'물리아 호텔뷔페 Buffet Sunday (성인)',price:43.3},
+      {id:'m72',name:'켐핀스키 코랄레스토랑 GOURMET 5코스',price:108.9},
+      {id:'m73',name:'켐핀스키 코랄레스토랑 GOURMET 6코스',price:133.1},
+      {id:'m74',name:'켐핀스키 코랄레스토랑 SIGNATURE 7코스',price:189.6},
+      {id:'m75',name:'켐핀스키 코랄레스토랑 SIGNATURE 8코스',price:217.8},
+    ]},
+    {group:'꾸따·스미냑·짱구', items:[
+      {id:'m25',name:'와하하 Half Pork Ribs',price:10.7},
+      {id:'m26',name:'와하하 Full Pork Ribs',price:17.3},
+      {id:'m27',name:'와하하 Nasi Goreng Babi',price:6.7},
+      {id:'m28',name:'이가와룽 Nasi Goreng + IceTea',price:9.1},
+      {id:'m29',name:'이가와룽 Grilled Pork Ribs + IceTea',price:18.1},
+      {id:'m30',name:'다스비스트로 Fried Rice',price:6.7},
+      {id:'m31',name:'다스비스트로 Pork Ribs 200g',price:10.0},
+      {id:'m32',name:'다스비스트로 Pork Ribs 400g',price:14.7},
+      {id:'m33',name:'까나비치클럽 Lunch Set',price:12.3},
+      {id:'m34',name:'까나비치클럽 Pork Ribs',price:17.3},
+      {id:'m35',name:'페퍼스 스미냑 식당 Set Menu',price:0,note:'단가 별도문의'},
+    ]},
+    {group:'우붓', items:[
+      {id:'m36',name:'발레우당 우붓 Ubud 1',price:10.0},
+      {id:'m37',name:'발레우당 우붓 Deluxe 1',price:12.3},
+      {id:'m38',name:'알라스하룸 Package1 (중식포함)',price:15.0},
+      {id:'m39',name:'알라스하룸 Set Menu',price:18.0},
+      {id:'m40',name:'라그랜데 Indo Food',price:8.7},
+      {id:'m41',name:'라그랜데 Buffet Special',price:9.0},
+      {id:'m42',name:'카페 와얀 우붓 Nasi/Mie Goreng',price:10.0},
+      {id:'m43',name:'로얄피타마하 Western/Indonesian Set',price:20.7},
+      {id:'m44',name:'그린쿠부 Set Menu',price:5.7},
+      {id:'m45',name:'리빙스톤 홀리그라운드 Crispy Duck+IceTea (낀따마니)',price:9.0},
+      {id:'m46',name:'리빙스톤 홀리그라운드 Pork Ribs+IceTea (우붓)',price:9.7},
+      {id:'m47',name:'허브레스토랑 Set Menu D',price:10.3},
+      {id:'m48',name:'허브레스토랑 Set Menu E',price:9.0},
+      {id:'m49',name:'피손우붓 Crispy Pork Fried Rice',price:7.4},
+      {id:'m50',name:'피손우붓 Prawn Pasta',price:9.2},
+      {id:'m51',name:'피손우붓 Truffle Steak',price:20.6},
+      {id:'m52',name:'뇨냐시크릿 Paket A (FIT 2-4pax)',price:10.7},
+      {id:'m53',name:'뇨냐시크릿 Paket B',price:14.0},
+      {id:'m54',name:'뇨냐시크릿 Seafood FIT',price:23.3},
+      {id:'m55',name:'젠델라 GWK Indonesian 3Courses',price:18.3},
+      {id:'m56',name:'젠델라 GWK Western 3Courses',price:25.0},
+    ]},
+    {group:'기타', items:[
+      {id:'m57',name:'주쿵레스토랑 Indonesian Package1',price:9.7},
+      {id:'m58',name:'아부리스시 Miso+Okisawa+Ocha',price:12.0},
+      {id:'m59',name:'와나꾸 Lucky Set (Min 2pax)',price:14.7},
+      {id:'m60',name:'프로패서 Option A',price:13.3},
+      {id:'m61',name:'붐부발리 Balinese Rijstafel',price:48.3,unit:'2인'},
+      {id:'m62',name:'사마사마 Yakiniku AYCE',price:13.3,unit:'2인'},
+      {id:'m63',name:'스시테이 Sushi Set',price:10.0},
+      {id:'m64',name:'수키야키 AYCE',price:11.7},
+      {id:'m65',name:'카이젠 AYCE',price:13.3},
+      {id:'m66',name:'옴마데이클럽 Pizza+Spaghetti (성인)',price:13.7},
+      {id:'m67',name:'옴마데이클럽 Pizza+Spaghetti (아동)',price:10.0},
+      {id:'m68',name:'오션다이너스티 Special Set 1or2',price:16.7},
+      {id:'m69',name:'아마나이아 Set C (1-4pax)',price:60.0},
+      {id:'m70',name:'아마나이아 Set C (5-8pax)',price:113.3},
+      {id:'m71',name:'노티누리 Set A (Half Ribs)',price:13.0},
+    ]},
+  ],
+
+  /* ② 관광지&입장료 (35개, 1인 단가 USD) ──────────────────────── */
+  admission: [
+    {group:'사원·문화', items:[
+      {id:'a01',name:'울루와뚜 사원',price:4.0},
+      {id:'a02',name:'께착댄스',price:10.0},
+      {id:'a03',name:'따나롯 사원',price:5.0},
+      {id:'a04',name:'사라스와티 사원 (Welcome Drink)',price:4.0},
+      {id:'a05',name:'GWK',price:6.7},
+      {id:'a06',name:'렘뿌양',price:8.0},
+      {id:'a07',name:'띠르따강가',price:6.0},
+      {id:'a08',name:'뿌뿌딴 광장',price:6.7},
+      {id:'a09',name:'따만우중',price:6.7},
+    ]},
+    {group:'자연·뷰포인트', items:[
+      {id:'a10',name:'몽키포레스트 (주중/성인)',price:6.7},
+      {id:'a11',name:'몽키포레스트 (주중/아동)',price:5.3},
+      {id:'a12',name:'몽키포레스트 (주말/성인)',price:8.0},
+      {id:'a13',name:'몽키포레스트 (주말/아동)',price:6.7},
+      {id:'a14',name:'뜨구눙안 폭포',price:2.0},
+      {id:'a15',name:'옴마데이클럽 폭포 (성인)',price:2.0},
+      {id:'a16',name:'옴마데이클럽 폭포 (아동)',price:1.0},
+      {id:'a17',name:'라항한 스위트',price:11.3},
+      {id:'a18',name:'떼갈랄랑',price:3.3},
+      {id:'a19',name:'양양비치',price:2.0},
+      {id:'a20',name:'빠당빠당 비치',price:1.0},
+      {id:'a21',name:'빤다와 비치',price:1.7},
+      {id:'a22',name:'멜라스티 비치',price:1.0},
+      {id:'a23',name:'워터블로우',price:1.7},
+      {id:'a24',name:'피치븐 스윙 (All Swing+Photo)',price:6.7},
+      {id:'a25',name:'술루반 / 블루포인트 (무료)',price:0.0},
+    ]},
+    {group:'체험·액티비티', items:[
+      {id:'a26',name:'알라스하룸 입장만',price:3.3},
+      {id:'a27',name:'알라스하룸 싱글스윙',price:8.3},
+      {id:'a28',name:'알라스하룸 커플스윙',price:5.0,unit:'2인'},
+      {id:'a29',name:'ATV쿠버 싱글 1.5H',price:33.3},
+      {id:'a30',name:'ATV쿠버 탠덤 1.5H (2인)',price:50.0,unit:'2인'},
+      {id:'a31',name:'ATV쿠버 싱글 1H',price:26.7},
+      {id:'a32',name:'ATV쿠버 탠덤 1H (2인)',price:40.0,unit:'2인'},
+      {id:'a33',name:'ATV쿠버 싱글 30분',price:20.0},
+      {id:'a34',name:'ATV쿠버 탠덤 30분 (2인)',price:30.0,unit:'2인'},
+      {id:'a35',name:'따나바락 (셔틀+입장)',price:3.0},
+    ]},
+  ],
+
+  /* ③ 옵션투어 (70개, USD, 단위: 인/2인/대) ────────────────────── */
+  tours: [
+    {group:'크루즈·보트', items:[
+      {id:'t01',name:'발리하이 데이크루즈 (성인)',price:102.7},
+      {id:'t02',name:'발리하이 데이크루즈 (아동)',price:72.5},
+      {id:'t03',name:'발리하이 선셋디너 (성인)',price:66.4},
+      {id:'t04',name:'발리하이 선셋디너 (아동)',price:51.9},
+      {id:'t05',name:'바운티 데이크루즈',price:73.0},
+      {id:'t06',name:'바운티 선셋디너',price:36.0},
+      {id:'t07',name:'피니시크루즈 선셋 (성인)',price:33.7},
+      {id:'t08',name:'피니시크루즈 선셋 (아동)',price:17.9},
+    ]},
+    {group:'래프팅·액티비티', items:[
+      {id:'t09',name:'소백 래프팅',price:25.3},
+      {id:'t10',name:'앙카사 래프팅',price:15.3},
+      {id:'t11',name:'앙카사 래프팅+스윙 (2인)',price:22.0,unit:'2인'},
+      {id:'t12',name:'발리지프투어 선라이즈 (1대)',price:36.7,unit:'대'},
+      {id:'t13',name:'발리지프투어 선라이즈+블랙라바 (1대)',price:43.3,unit:'대'},
+      {id:'t14',name:'바투르 하이킹',price:23.3},
+      {id:'t15',name:'낀따마니 토야온천',price:22.0},
+    ]},
+    {group:'워터파크·어드벤처', items:[
+      {id:'t16',name:'워터봄 (성인)',price:37.7},
+      {id:'t17',name:'워터봄 (아동)',price:31.3},
+    ]},
+    {group:'사파리·동물원', items:[
+      {id:'t18',name:'사파리 정글후퍼 (성인, 식사미포함)',price:30.3},
+      {id:'t19',name:'사파리 정글후퍼 (아동)',price:24.3},
+      {id:'t20',name:'사파리 지프 4x4 (1대)',price:60.0,unit:'대'},
+      {id:'t21',name:'나이트사파리 (성인, 디너포함)',price:64.0},
+      {id:'t22',name:'나이트사파리 (아동)',price:52.3},
+      {id:'t23',name:'Sea Dragon (성인)',price:30.3},
+      {id:'t24',name:'Sea Dragon (아동)',price:24.3},
+      {id:'t25',name:'Clownfish (성인)',price:48.0},
+      {id:'t26',name:'Clownfish (아동)',price:38.4},
+      {id:'t27',name:'바루나 프리미엄 (성인)',price:103.3},
+      {id:'t28',name:'바루나 프리미엄 (아동)',price:74.4},
+      {id:'t29',name:'바루나 디럭스 (성인)',price:78.5},
+      {id:'t30',name:'바루나 레귤러 (성인, 식사미포함)',price:62.0},
+      {id:'t31',name:'발리버드파크 (성인)',price:13.3},
+      {id:'t32',name:'발리버드파크 (아동)',price:7.7},
+      {id:'t33',name:'발리주 (성인)',price:18.7},
+      {id:'t34',name:'발리주 (아동)',price:13.3},
+    ]},
+    {group:'수중·스노쿨링·다이빙', items:[
+      {id:'t35',name:'누사페니다투어 (기존업체, 2인, 스노쿨링포함)',price:56.7,unit:'2인'},
+      {id:'t36',name:'누사페니다투어 (BaliRealTrip, 2인)',price:73.0,unit:'2인'},
+      {id:'t37',name:'누사페니다 스쿠버다이빙',price:126.7},
+      {id:'t38',name:'빠당바이 스쿠버다이빙',price:126.7},
+      {id:'t39',name:'빠당바이 스노쿨링',price:20.0},
+      {id:'t40',name:'발리엑조틱마린 Discovery (성인)',price:84.9},
+      {id:'t41',name:'발리엑조틱마린 Discovery (아동)',price:76.0},
+      {id:'t42',name:'발리엑조틱마린 Encounter (성인)',price:37.7},
+      {id:'t43',name:'발리엑조틱마린 Explorer (성인)',price:21.3},
+    ]},
+    {group:'수상스포츠', items:[
+      {id:'t44',name:'돌핀 바나나보트 15분',price:4.7},
+      {id:'t45',name:'돌핀 Flying Fish 3회',price:8.7},
+      {id:'t46',name:'돌핀 스노쿨링 1H',price:6.0},
+      {id:'t47',name:'돌핀 파라세일링 6분',price:14.0},
+      {id:'t48',name:'돌핀 PkgA (파라세일링+바나나+제트스키)',price:13.3},
+      {id:'t49',name:'돌핀 PkgB (스노쿨링+글라스보텀+거북이)',price:30.0},
+      {id:'t50',name:'돌핀 PkgC (파라세일링+씨워커+바나나+제트)',price:30.3},
+      {id:'t51',name:'돌핀 PkgD (플라이보드+씨워커+파라세일링)',price:50.3},
+    ]},
+    {group:'서핑·골프', items:[
+      {id:'t52',name:'오딧세이서핑 1인 2H',price:41.3},
+      {id:'t53',name:'오딧세이서핑 2인 2H',price:31.0,unit:'2인'},
+      {id:'t54',name:'뉴꾸타골프 (주말)',price:120.0},
+      {id:'t55',name:'뉴꾸타골프 (주중)',price:126.7},
+      {id:'t56',name:'발리내셔널골프 18H',price:126.7},
+      {id:'t57',name:'한다라골프 (주중)',price:83.3},
+      {id:'t58',name:'한다라골프 (주말)',price:93.3},
+    ]},
+    {group:'기타투어', items:[
+      {id:'t59',name:'폭스바겐클래식카 3H (2인)',price:46.7,unit:'2인'},
+      {id:'t60',name:'폭스바겐클래식카 7H (2인)',price:63.3,unit:'2인'},
+      {id:'t61',name:'폭스바겐클래식카 10H (2인)',price:70.0,unit:'2인'},
+      {id:'t62',name:'폭스바겐클래식카 12H (2인)',price:80.0,unit:'2인'},
+      {id:'t63',name:'사바베이와이너리 FIT (1-10명)',price:13.1},
+      {id:'t64',name:'사바베이와이너리 GIT (10명+)',price:12.3},
+      {id:'t65',name:'데브단쇼 A석 (성인, 월/수/토)',price:33.3},
+      {id:'t66',name:'데브단쇼 B석 (성인)',price:23.3},
+      {id:'t67',name:'데브단쇼 C석 (성인)',price:13.3},
+      {id:'t68',name:'데브단쇼 (아동)',price:16.7},
+      {id:'t69',name:'짐바란씨푸드 500g',price:18.7},
+      {id:'t70',name:'짐바란씨푸드 700g',price:25.3},
+    ]},
+  ],
+
+  /* ④ 스파&마사지 (40개, 1인 단가 USD) ────────────────────────── */
+  spa: [
+    {group:'꾸따·레기안', items:[
+      {id:'s01',name:'할로발리스파 Thai Massage 2H',price:18.0},
+      {id:'s02',name:'할로발리스파 Natural Aroma Spa 2H',price:22.7},
+      {id:'s03',name:'할로발리스파 Red Wine Spa 2H',price:33.7},
+      {id:'s04',name:'할로발리스파 Chocolate Spa 2H',price:23.7},
+      {id:'s05',name:'할로발리스파 Aroma Body Massage 2H',price:20.7},
+      {id:'s06',name:'할로발리스파 Aroma Stone Massage 2H',price:21.7},
+      {id:'s07',name:'힐링스파 Aroma Massage 2H',price:17.3},
+      {id:'s08',name:'힐링스파 Chocolate Stone 2H',price:18.7},
+      {id:'s09',name:'힐링스파 Thai Massage 2H',price:14.0},
+      {id:'s10',name:'달라스파 꾸따 Balinese Massage 1H',price:28.3},
+      {id:'s11',name:'달라스파 꾸따 Balinese Massage 90min',price:34.6},
+      {id:'s12',name:'발리오키드스파 꾸따 Aroma Balinese 2H',price:17.3},
+      {id:'s13',name:'발리오키드스파 꾸따 Aroma Lulur Spa 2H',price:17.3},
+      {id:'s14',name:'스카라즈픈스파 Thai/Aroma/Balinese/Stone 2H',price:18.0},
+    ]},
+    {group:'누사두아', items:[
+      {id:'s15',name:'로얄오키드스파 Aroma Balinese 2H',price:17.3},
+      {id:'s16',name:'로얄오키드스파 Aroma Lulur Spa 2H',price:17.3},
+    ]},
+    {group:'우붓', items:[
+      {id:'s17',name:'후아스파 Signature Hua SPA 2H',price:27.7},
+      {id:'s18',name:'후아스파 Signature Massage 1H',price:16.3},
+      {id:'s19',name:'후아스파 Signature Massage 2H',price:23.7},
+      {id:'s20',name:'후아스파 Hot Stone Massage 2H',price:19.7},
+      {id:'s21',name:'후아스파 Reflexology 1H',price:13.3},
+      {id:'s22',name:'피라미드스파 Balinese Massage 2H',price:34.7},
+      {id:'s23',name:'피라미드스파 Balinese Massage 1H',price:24.5},
+      {id:'s24',name:'피라미드스파 Stone Massage 2H',price:37.0},
+      {id:'s25',name:'피라미드스파 Scrub Body Treatment 2H',price:40.3},
+      {id:'s26',name:'피라미드스파 Wine Body Treatment 2H',price:42.0},
+      {id:'s27',name:'따만아이르스파 Balinese Massage 2H',price:37.2},
+      {id:'s28',name:'따만아이르스파 Lulur Moringa 2H',price:40.4},
+      {id:'s29',name:'아이시스스파 Coconut Spa 2H',price:16.7},
+      {id:'s30',name:'아이시스스파 Chocolate Spa 2H',price:16.7},
+      {id:'s31',name:'아이시스스파 Milk Spa 2H',price:18.7},
+      {id:'s32',name:'아이시스스파 Aroma Oil Massage 2H',price:15.3},
+      {id:'s33',name:'아이시스스파 Stone Massage 2H',price:15.3},
+      {id:'s34',name:'아비샤스파 Signature Massage 2H',price:31.7},
+      {id:'s35',name:'아비샤스파 Stone Massage 2H',price:35.0},
+      {id:'s36',name:'더칼마스파 Balinese Massage 2H',price:28.7},
+      {id:'s37',name:'더칼마스파 Aromatherapy 2H',price:28.7},
+      {id:'s38',name:'더칼마스파 Hot Stone 2H',price:28.7},
+      {id:'s39',name:'아비안클룸푸스파 Thai Massage 2H',price:18.7},
+      {id:'s40',name:'라비에스파 Thai Massage 2H',price:17.3},
+    ]},
+  ],
+};
+
+/* ════════════════════════════════════════════════════════════
+   v2 추가: 패키지(일정) 데이터
+   - days: 일정표 화면에 표시되는 간략 일정 카드 데이터
+   - preset: "이 일정으로 시작하기" 클릭 시 계산기에 자동 반영되는 값
+   ════════════════════════════════════════════════════════════ */
+const PACKAGES = [
+  {
+    id:'pkg_hm_4n6d',
+    tripType:'honeymoon',
+    badge:'💑 허니문 추천',
+    title:'발리 허니문 4박6일',
+    subtitle:'럭셔리 휴양형 · 짐바란 아야나 2박 + 우붓 카욘정글풀빌라 2박',
+    persons:2, nights:4,
+    highlights:['짐바란 아야나 리조트 2박','더카욘정글 풀빌라 2박','누사페니다 스노클링','짐바란 씨푸드 디너 · 발마사지'],
+    days:[
+      {day:1, title:'인천 → 발리', hotel:'림바 짐바란 바이 아야나', items:['인천공항 출발 (KE431)','발리공항 도착 후 가이드 미팅','호텔 투숙 및 휴식'], meals:{b:'-',l:'-',d:'기내식'}},
+      {day:2, title:'짐바란 남부 투어', hotel:'림바 짐바란 바이 아야나', items:['가루다공원(GWK)','싱글핀 비치클럽 런치','술루반 비치 · 울루와뚜 사원','빤다와 비치 따나바락','석식: 와하하 풀폭립세트'], meals:{b:'호텔식',l:'싱글핀',d:'와하하 풀폭립'}},
+      {day:3, title:'누사페니다 스노클링 → 우붓', hotel:'더카욘정글 리조트', items:['새벽 사누르항 출발 → 누사페니다','스노클링(만타베이·크리스탈베이 등)','서부섬 투어(브로큰비치 등)','우붓 이동, 더카욘정글 체크인'], meals:{b:'호텔식',l:'현지식',d:'리조트 자유식'}},
+      {day:4, title:'자유일정', hotel:'더카욘정글 리조트', items:['전일정 자유시간 (가이드/차량 없음)','정글 풀빌라에서 휴식'], meals:{b:'호텔식',l:'-',d:'-'}},
+      {day:5, title:'우붓 → 짐바란', hotel:'-', items:['뜨갈랄랑 계단식논','발리스윙(2인) · 알라스하룸 런치세트','몽키포레스트 · 우붓왕궁/시장','사라스와띠 사원(웰컴드링크)','짐바란 씨푸드 디너 + 선셋','발마사지 60분 · 공항 이동'], meals:{b:'호텔식(플로팅)',l:'알라스하룸 런치세트',d:'짐바란 씨푸드'}},
+      {day:6, title:'발리 → 인천', hotel:'-', items:['발리공항 출발 (KE434, 01:10)','인천공항 도착 (09:25)'], meals:{b:'기내식',l:'-',d:'-'}},
+    ],
+    preset:{
+      hotel1:{id:'h34', nights:2, season:'low'},
+      hotel2:{id:'h35', nights:2, season:'low'},
+      meals:{m20:2, m26:2},
+      admission:['a05','a01','a25','a35','a18','a28','a04'],
+      tours:['t35','t69'],
+      spa:['s21'],
+      guideId:'g01',
+    },
+  },
+  {
+    id:'pkg_hm_5n7d',
+    tripType:'honeymoon',
+    badge:'💑 허니문 프리미엄',
+    title:'발리 허니문 5박7일',
+    subtitle:'럭셔리 휴양형 · 짐바란 아야나 3박 + 누사두아 아푸르바 켐핀스키 풀빌라 2박',
+    persons:2, nights:5,
+    highlights:['짐바란 아야나 리조트 3박','누사두아 켐핀스키 풀빌라 2박','누사렘봉안 데이크루즈','코랄레스토랑 6코스 디너 · 짐바란 씨푸드'],
+    days:[
+      {day:1, title:'인천 → 발리', hotel:'림바 짐바란 바이 아야나', items:['인천공항 출발 (KE633, 16:20)','발리공항 도착(22:30) 후 가이드 미팅','호텔 투숙 및 휴식'], meals:{b:'-',l:'기내식',d:'현지식'}},
+      {day:2, title:'자유일정', hotel:'림바 짐바란 바이 아야나', items:['전일정 자유시간 (가이드/차량 없음)'], meals:{b:'호텔식',l:'-',d:'-'}},
+      {day:3, title:'누사렘봉안 데이크루즈', hotel:'림바 짐바란 바이 아야나', items:['누사렘봉안 데이크루즈(스노클링·바나나보트·워터슬라이드, 중식포함)','한식당 무제한 삼겹살 디너','아로마 스파 90분(팁포함)'], meals:{b:'호텔식',l:'크루즈 중식 포함',d:'삼겹살'}},
+      {day:4, title:'우붓 경유 → 누사두아', hotel:'더 아푸르바 켐핀스키', items:['체크아웃 후 우붓 이동','뜨갈랄랑 계단식논','알라스하룸 커플 발리스윙 + 런치세트','몽키포레스트 · 우붓왕궁/시장','사라스와띠 사원(웰컴드링크)','누사두아 켐핀스키 체크인','코랄레스토랑 Gourmet 2인 6코스 디너'], meals:{b:'호텔식',l:'알라스하룸 런치세트',d:'코랄레스토랑 6코스'}},
+      {day:5, title:'자유일정', hotel:'더 아푸르바 켐핀스키', items:['전일정 자유시간 (가이드/차량 없음)'], meals:{b:'호텔식',l:'-',d:'-'}},
+      {day:6, title:'누사두아 → 짐바란 → 인천', hotel:'-', items:['체크아웃 후 발리 남부 이동','싱글핀 비치클럽 런치','술루반 비치 · 울루와뚜 사원','빤다와 비치 따나바락','짐바란 씨푸드(랍스터 700g) + 선셋','발마사지 60분 · 공항 이동','발리공항 출발 (KE634, 23:45)'], meals:{b:'호텔식',l:'싱글핀',d:'짐바란 씨푸드'}},
+      {day:7, title:'인천 도착', hotel:'-', items:['인천공항 도착 (07:45)'], meals:{b:'기내식',l:'-',d:'-'}},
+    ],
+    preset:{
+      hotel1:{id:'h34', nights:3, season:'low'},
+      hotel2:{id:'h36', nights:2, season:'low'},
+      meals:{m20:2, m26:2, m73:2},
+      admission:['a18','a28','a10','a04','a01','a25','a35'],
+      tours:['t36','t70'],
+      spa:['s19','s21'],
+      guideId:'g01',
+    },
+  },
+  {
+    id:'pkg_fam_4n6d',
+    tripType:'family',
+    badge:'👨‍👩‍👧‍👦 가족여행 추천',
+    title:'발리 가족여행 4박6일 (관광형)',
+    subtitle:'짐바란 아야나 4박 · 16인승 전용차량 · 노쇼핑·노옵션',
+    persons:4, nights:4,
+    highlights:['짐바란 아야나 리조트 4박','우붓 + 스미냑 핵심 관광','짐바란 씨푸드 디너 · 발마사지','전담 한국어 가이드'],
+    days:[
+      {day:1, title:'인천 → 발리', hotel:'림바 짐바란 바이 아야나', items:['인천공항 출발','발리공항 도착 후 가이드 미팅','호텔 투숙 및 휴식'], meals:{b:'-',l:'-',d:'기내식'}},
+      {day:2, title:'짐바란 남부 투어', hotel:'림바 짐바란 바이 아야나', items:['가루다공원(GWK)','싱글핀 비치클럽 런치','술루반 비치 · 울루와뚜 사원','빤다와 비치 따나바락','석식: 사마사마 야끼니꾸'], meals:{b:'호텔식',l:'싱글핀',d:'야끼니꾸'}},
+      {day:3, title:'우붓 → 스미냑', hotel:'(우붓·스미냑 자유일정)', items:['우붓 이동, 뜨갈랄랑 계단식논','발리스윙(2인) + 알라스하룸 런치세트','몽키포레스트 · 우붓왕궁/시장','사라스와띠 사원(웰컴드링크)','스미냑 이동, 와하하 풀폭립 디너','포테이토헤드 비치클럽'], meals:{b:'호텔식',l:'알라스하룸 런치세트',d:'와하하 풀폭립'}},
+      {day:4, title:'자유일정', hotel:'림바 짐바란 바이 아야나', items:['전일정 자유시간 (가이드/차량 없음)'], meals:{b:'호텔식',l:'-',d:'-'}},
+      {day:5, title:'짱구 → 짐바란', hotel:'-', items:['체크아웃 후 짱구 이동','짱구 시내 자유관광(Love Anchor 등)','빈땅 슈퍼마켓 자유쇼핑','짐바란 씨푸드 디너 + 선셋','발마사지 60분 · 공항 이동'], meals:{b:'호텔식',l:'자유식(불포함)',d:'짐바란 씨푸드'}},
+      {day:6, title:'인천 도착', hotel:'-', items:['인천공항 도착'], meals:{b:'기내식',l:'-',d:'-'}},
+    ],
+    preset:{
+      hotel1:{id:'h34', nights:4, season:'low'},
+      hotel2:{id:'', nights:0, season:'low'},
+      meals:{m20:4, m25:4, m26:4},
+      admission:['a05','a01','a25','a35','a18','a28','a10','a04'],
+      tours:['t69'],
+      spa:['s21'],
+      guideId:'g01',
+    },
+  },
+];
+
+/* ════════════════════════════════════════════════════════════
+   상태값 (state)
+   ════════════════════════════════════════════════════════════ */
+let tripType = 'honeymoon';     // 'honeymoon' | 'family' → 마진 결정
+let hotel1Id = '';
+let hotel2Id = '';
+let hotel1Custom = 0;            // 기타호텔 직접입력 단가(USD/박)
+let hotel2Custom = 0;
+let guideId = 'g01';
+let mealCounts = {};             // {mealId: count}
+let admSel = new Set();          // 선택된 입장료 id
+let tourSel = new Set();         // 선택된 옵션투어 id
+let spaSel = new Set();          // 선택된 스파 id
+
+/* ════════════════════════════════════════════════════════════
+   유틸리티 함수
+   ════════════════════════════════════════════════════════════ */
+function getV(id){
+  const el = document.getElementById(id);
+  if(!el) return 0;
+  const v = parseFloat(el.value);
+  return isNaN(v) ? 0 : v;
+}
+function getPersons(){ return Math.max(1, Math.round(getV('persons')) || 1); }
+function getNights(){ return Math.max(0, Math.round(getV('nights')) || 0); }
+function getExchange(){ return getV('exchange') || PRICE.exchange; }
+function fmtUSD(v){ return '$' + v.toLocaleString('en-US',{minimumFractionDigits:1,maximumFractionDigits:1}); }
+function fmtKRW(v){ return '₩' + Math.round(v).toLocaleString('ko-KR'); }
+function roundUp5000(v){ return Math.ceil(v/5000)*5000; }
+/* 식사 단가 보정: 소수점 0.1~0.4 → 0.5로 올림 / 0.5 이상 → 다음 정수로 반올림(올림) */
+function roundMealPrice(v){
+  const base = Math.floor(v);
+  const dec = v - base;
+  if(dec === 0) return v;
+  if(dec < 0.5) return base + 0.5;
+  return base + 1;
+}
+/* 고정 단가 (1인당, USD) */
+const NOSHOP_RATE_FIXED = 30; // 노쇼핑·공동경비
+const LOCAL_AGENCY_FEE  = 40; // 현지여행사 서비스수수료
+
+/* 인원수 → 차량 자동배정 */
+function getVehicleRule(n){
+  return PRICE.vehicle.find(v => n <= v.max) || PRICE.vehicle[PRICE.vehicle.length-1];
+}
+/* 인원수 → 가이드 인원 자동배정 */
+function getGuideCount(n){
+  const r = PRICE.guideAssign.find(g => n <= g.max) || PRICE.guideAssign[PRICE.guideAssign.length-1];
+  return r.count;
+}
+/* 항목 단위(unit)에 따른 인원당 환산 배수 */
+function unitMultiplier(item, persons){
+  if(item.unit === '2인') return persons/2;
+  if(item.unit === '대')  return 1;
+  return persons; // 기본 '인'
+}
+/* 모든 카테고리(식사/입장료/투어/스파)에서 id로 항목 찾기 */
+function findItem(id){
+  const groups = [].concat(PRICE.meals, PRICE.admission, PRICE.tours, PRICE.spa);
+  for(const g of groups){
+    const found = g.items.find(it => it.id === id);
+    if(found) return found;
+  }
+  return null;
+}
+
+/* ════════════════════════════════════════════════════════════
+   여행유형 전환 (허니문 ↔ 가족/일반여행) → 마진 결정
+   ════════════════════════════════════════════════════════════ */
+window.switchTripType = function(type){
+  tripType = type;
+  document.querySelectorAll('#mot-bali-wrap .region-tab').forEach((el,i)=>{
+    el.classList.toggle('active', (i===0 && type==='honeymoon') || (i===1 && type==='family'));
+  });
+  calc();
+};
+
+/* ════════════════════════════════════════════════════════════
+   카드 생성 헬퍼
+   ════════════════════════════════════════════════════════════ */
+function makeCard(title, bodyHtml){
+  return `<div class="card">
+    <div class="card-header">${title}</div>
+    <div class="card-body">${bodyHtml}</div>
+  </div>`;
+}
+
+/* ════════════════════════════════════════════════════════════
+   입력 패널 빌드
+   ════════════════════════════════════════════════════════════ */
+function buildPanel(){
+  const panel = document.getElementById('input-panel');
+  let html = '';
+
+  /* 1. 기본정보 */
+  html += makeCard('📋 기본 정보', `
+    <div class="form-row">
+      <div class="form-group">
+        <label class="form-label">인원수</label>
+        <input type="number" id="persons" class="form-control" value="2" min="1" step="1" oninput="calc()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">박수 (총 일정)</label>
+        <input type="number" id="nights" class="form-control" value="4" min="0" step="1" oninput="onNightsChange()">
+      </div>
+      <div class="form-group">
+        <label class="form-label">환율 (KRW/USD)</label>
+        <input type="number" id="exchange" class="form-control" value="${PRICE.exchange}" step="1" readonly style="background:#f3f4f6;cursor:not-allowed">
+        <div id="exchange-status" style="font-size:10px;color:#888;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis"></div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">차량·가이드 이용일수</label>
+        <input type="number" id="vdays" class="form-control" value="4" min="0" step="1" oninput="calc()">
+      </div>
+    </div>
+  `);
+
+  /* 2. 숙박 (호텔1 + 호텔2) */
+  html += makeCard('🏨 숙박', buildHotelSectionHtml());
+
+  /* 3. 차량 & 가이드 */
+  const guideOptions = PRICE.guide.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  html += makeCard('🚐 차량 &amp; 가이드 (인원수 자동배정)', `
+    <div id="vehicle-info" class="vehicle-info"></div>
+    <div class="form-row" style="margin-top:10px">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">가이드 종류</label>
+        <select id="guide-select" class="form-control" onchange="calc()">${guideOptions}</select>
+      </div>
+    </div>
+    <div id="guide-info" class="vehicle-info"></div>
+  `);
+
+  /* 4. 식사 */
+  html += makeCard('🍽 식사 (수량 직접 입력)', buildMealGroupsHtml());
+
+  /* 5. 관광지 & 입장료 */
+  html += makeCard('🎫 관광지 &amp; 입장료', buildCheckboxGroupsHtml(PRICE.admission, 'adm'));
+
+  /* 6. 옵션투어 */
+  html += makeCard('🌊 옵션투어', buildCheckboxGroupsHtml(PRICE.tours, 'tour'));
+
+  /* 7. 스파 & 마사지 */
+  html += makeCard('💆 스파 &amp; 마사지', buildCheckboxGroupsHtml(PRICE.spa, 'spa'));
+
+  /* 8. 기타 비용 */
+  html += makeCard('➕ 기타 비용', `
+    <div class="form-row">
+      <div class="form-group" style="grid-column:1/-1">
+        <label class="form-label">✈️ 항공료 (원/인, 직접입력)</label>
+        <input type="number" id="air-per" class="form-control" value="0" min="0" step="1000" oninput="calc()">
+      </div>
+    </div>
+    <div class="option-note">※ 항공료는 네이버항공권 등 외부 데이터를 참고하여 직접 입력하세요. 지상비와 별도 합산됩니다.<br>※ 노쇼핑·공동경비(1인당 $${NOSHOP_RATE_FIXED}) 및 현지여행사 서비스수수료(1인당 $${LOCAL_AGENCY_FEE})는 자동으로 반영됩니다.</div>
+  `);
+
+  panel.innerHTML = html;
+  renderSelectedMeals();
+  renderSelectedOptions('adm');
+  renderSelectedOptions('tour');
+  renderSelectedOptions('spa');
+}
+
+/* 박수 변경 시 차량/가이드 이용일수 + 호텔 박수 기본값 동기화 */
+window.onNightsChange = function(){
+  const n = getNights();
+  const vdays = document.getElementById('vdays');
+  if(vdays) vdays.value = n;
+  const h1n = document.getElementById('hotel1-nights');
+  if(h1n) h1n.value = n;
+  calc();
+};
+
+/* ════════════════════════════════════════════════════════════
+   숙박(호텔1+호텔2) 섹션 HTML
+   ════════════════════════════════════════════════════════════ */
+function buildHotelSectionHtml(){
+  // 권역별 optgroup 구성
+  const regions = [];
+  PRICE.hotels.forEach(h=>{ if(!regions.includes(h.region)) regions.push(h.region); });
+  function optionsHtml(){
+    return regions.map(r=>{
+      const opts = PRICE.hotels.filter(h=>h.region===r).map(h=>{
+        const label = h.custom ? h.name : `${h.name} (${h.sub})`;
+        return `<option value="${h.id}">${label}</option>`;
+      }).join('');
+      return `<optgroup label="${r}">${opts}</optgroup>`;
+    }).join('');
+  }
+  return `
+    <div class="dual-hotel">
+      <div>
+        <div class="hotel-section-label">숙박 1 (필수)</div>
+        <div class="form-row" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <label class="form-label">호텔 선택</label>
+            <select id="hotel1-select" class="form-control" onchange="calc()">${optionsHtml()}</select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">박수</label>
+            <input type="number" id="hotel1-nights" class="form-control" value="4" min="0" step="1" oninput="calc()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">시즌</label>
+            <select id="hotel1-season" class="form-control" onchange="calc()">
+              <option value="low">비수기</option>
+              <option value="high">성수기 (7-8월·12/25-1/1)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="hotel1-custom-row" style="display:none">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">기타호텔 1박 단가 (USD)</label>
+            <input type="number" id="hotel1-custom" class="form-control" value="0" min="0" step="1" oninput="calc()">
+          </div>
+        </div>
+        <div id="hotel1-info" class="vehicle-info"></div>
+      </div>
+      <div>
+        <div class="hotel-section-label">숙박 2 (선택, 박수 0이면 미적용)</div>
+        <div class="form-row" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <label class="form-label">호텔 선택</label>
+            <select id="hotel2-select" class="form-control" onchange="calc()">${optionsHtml()}</select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">박수</label>
+            <input type="number" id="hotel2-nights" class="form-control" value="0" min="0" step="1" oninput="calc()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">시즌</label>
+            <select id="hotel2-season" class="form-control" onchange="calc()">
+              <option value="low">비수기</option>
+              <option value="high">성수기 (7-8월·12/25-1/1)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="hotel2-custom-row" style="display:none">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">기타호텔 1박 단가 (USD)</label>
+            <input type="number" id="hotel2-custom" class="form-control" value="0" min="0" step="1" oninput="calc()">
+          </div>
+        </div>
+        <div id="hotel2-info" class="vehicle-info"></div>
+      </div>
+    </div>
+  `;
+}
+
+/* ════════════════════════════════════════════════════════════
+   식사 섹션 HTML (그룹별 접이식 + 수량 카운터)
+   ════════════════════════════════════════════════════════════ */
+function buildMealGroupsHtml(){
+  const groupsHtml = PRICE.meals.map((g)=>{
+    const rows = g.items.map(it=>{
+      const noteHtml = it.note ? `<span class="option-note"> · ${it.note}</span>` : '';
+      const unitLabel = it.unit ? `/${it.unit}` : '/인';
+      return `
+      <div class="meal-row" id="meal-row-${it.id}">
+        <div style="flex:1">
+          <span class="meal-name">${it.name}</span>
+          <span class="meal-price">$${roundMealPrice(it.price).toFixed(1)}${unitLabel}</span>${noteHtml}
+        </div>
+        <div class="meal-ctrl">
+          <button type="button" class="meal-btn" onclick="adjMeal('${it.id}',-1)">－</button>
+          <span id="mc-${it.id}" style="min-width:18px;text-align:center;font-weight:700">0</span>
+          <button type="button" class="meal-btn" onclick="adjMeal('${it.id}',1)">＋</button>
+        </div>
+      </div>`;
+    }).join('');
+    return `<details class="item-group">
+      <summary>${g.group} (${g.items.length}개)</summary>
+      <div class="item-group-body">${rows}</div>
+    </details>`;
+  }).join('');
+  return `
+    <div class="subsection-title">✅ 선택된 식사</div>
+    <div id="meal-selected-list"></div>
+    <div class="subsection-title" style="margin-top:12px">🍽 지역별 식사 추가 (눌러서 펼치기)</div>
+    ${groupsHtml}
+  `;
+}
+
+window.adjMeal = function(id, delta){
+  const cur = mealCounts[id] || 0;
+  const next = Math.max(0, cur + delta);
+  mealCounts[id] = next;
+  const span = document.getElementById('mc-'+id);
+  if(span) span.textContent = next;
+  const row = document.getElementById('meal-row-'+id);
+  if(row) row.classList.toggle('selected', next > 0);
+  renderSelectedMeals();
+  calc();
+};
+
+/* "선택된 식사" 상단 요약 목록 렌더링 */
+window.renderSelectedMeals = function(){
+  const wrap = document.getElementById('meal-selected-list');
+  if(!wrap) return;
+  const selected = [];
+  PRICE.meals.forEach(g=>g.items.forEach(it=>{
+    if((mealCounts[it.id]||0) > 0) selected.push(it);
+  }));
+  if(selected.length === 0){
+    wrap.innerHTML = `<div class="meal-selected-empty">선택된 식사가 없습니다. 아래 지역별 목록에서 추가하세요.</div>`;
+    return;
+  }
+  wrap.innerHTML = selected.map(it=>{
+    const noteHtml = it.note ? `<span class="option-note"> · ${it.note}</span>` : '';
+    const unitLabel = it.unit ? `/${it.unit}` : '/인';
+    return `
+    <div class="meal-row selected" id="meal-row-top-${it.id}">
+      <div style="flex:1">
+        <span class="meal-name">${it.name}</span>
+        <span class="meal-price">$${roundMealPrice(it.price).toFixed(1)}${unitLabel}</span>${noteHtml}
+      </div>
+      <div class="meal-ctrl">
+        <button type="button" class="meal-btn" onclick="adjMeal('${it.id}',-1)">－</button>
+        <span id="mc-top-${it.id}" style="min-width:18px;text-align:center;font-weight:700">${mealCounts[it.id]}</span>
+        <button type="button" class="meal-btn" onclick="adjMeal('${it.id}',1)">＋</button>
+      </div>
+    </div>`;
+  }).join('');
+};
+
+/* ════════════════════════════════════════════════════════════
+   체크박스 그룹 HTML (입장료 / 옵션투어 / 스파)
+   ════════════════════════════════════════════════════════════ */
+function buildCheckboxGroupsHtml(dataGroups, prefix){
+  const groupsHtml = dataGroups.map((g)=>{
+    const items = g.items.map(it=>{
+      return `
+      <label class="option-item" id="opt-${it.id}">
+        <input type="checkbox" onchange="toggleSel('${prefix}','${it.id}',this.checked)">
+        <div class="option-label">
+          <span class="option-name">${it.name}</span>
+        </div>
+      </label>`;
+    }).join('');
+    return `<details class="item-group">
+      <summary>${g.group} (${g.items.length}개)</summary>
+      <div class="item-group-body"><div class="option-grid">${items}</div></div>
+    </details>`;
+  }).join('');
+  return `
+    <div class="subsection-title">✅ 선택됨</div>
+    <div id="${prefix}-selected-list"></div>
+    <div class="subsection-title" style="margin-top:12px">📂 항목 추가 (눌러서 펼치기)</div>
+    ${groupsHtml}
+  `;
+}
+
+window.toggleSel = function(prefix, id, checked){
+  const setMap = {adm:admSel, tour:tourSel, spa:spaSel};
+  const set = setMap[prefix];
+  if(checked) set.add(id); else set.delete(id);
+  const el = document.getElementById('opt-'+id);
+  if(el){
+    el.classList.toggle('selected', checked);
+    const cb = el.querySelector('input[type="checkbox"]');
+    if(cb) cb.checked = checked;
+  }
+  renderSelectedOptions(prefix);
+  calc();
+};
+
+/* "선택됨" 상단 요약 목록 렌더링 (입장료/옵션투어/스파 공용) */
+window.renderSelectedOptions = function(prefix){
+  const wrap = document.getElementById(prefix+'-selected-list');
+  if(!wrap) return;
+  const dataMap = {adm:PRICE.admission, tour:PRICE.tours, spa:PRICE.spa};
+  const setMap  = {adm:admSel, tour:tourSel, spa:spaSel};
+  const dataGroups = dataMap[prefix];
+  const set = setMap[prefix];
+  const selected = [];
+  dataGroups.forEach(g=>g.items.forEach(it=>{
+    if(set.has(it.id)) selected.push(it);
+  }));
+  if(selected.length === 0){
+    wrap.innerHTML = `<div class="meal-selected-empty">선택된 항목이 없습니다. 아래 목록에서 추가하세요.</div>`;
+    return;
+  }
+  wrap.innerHTML = `<div class="option-grid">${selected.map(it=>`
+    <label class="option-item selected" id="opt-top-${it.id}">
+      <input type="checkbox" checked onchange="toggleSel('${prefix}','${it.id}',this.checked)">
+      <div class="option-label">
+        <span class="option-name">${it.name}</span>
+      </div>
+    </label>`).join('')}</div>`;
+};
+
+/* ════════════════════════════════════════════════════════════
+   메인 계산 로직
+   ════════════════════════════════════════════════════════════ */
+const MARGIN_HONEYMOON = 500000; // 허니문: 1인당 +50만원
+const MARGIN_FAMILY    = 200000; // 일반/가족여행: 1인당 +20만원
+
+function calc(){
+  const persons  = getPersons();
+  const nights   = getNights();
+  const exchange = getExchange();
+  const vdaysRaw = getV('vdays');
+  const vdays    = vdaysRaw > 0 ? vdaysRaw : nights;
+
+  /* ── 호텔 (숙박1 + 숙박2) ── */
+  let hotelTotalUSD = 0;
+  const hotelDetails = [];
+  ['1','2'].forEach(n=>{
+    const sel       = document.getElementById('hotel'+n+'-select');
+    const nightsEl  = document.getElementById('hotel'+n+'-nights');
+    const seasonEl  = document.getElementById('hotel'+n+'-season');
+    const customRow = document.getElementById('hotel'+n+'-custom-row');
+    const infoEl    = document.getElementById('hotel'+n+'-info');
+    if(!sel) return;
+    const hotel = PRICE.hotels.find(h=>h.id===sel.value);
+    if(!hotel) return;
+    const hn = Math.max(0, Math.round(parseFloat(nightsEl.value)) || 0);
+    const season = seasonEl.value;
+    let unitPrice;
+    if(hotel.custom){
+      customRow.style.display = '';
+      unitPrice = getV('hotel'+n+'-custom');
+    } else {
+      customRow.style.display = 'none';
+      unitPrice = hotel.price[season];
+    }
+    const rooms = Math.ceil(persons / hotel.cap);
+    const cost = unitPrice * hn * rooms;
+    hotelTotalUSD += cost;
+    if(hn > 0){
+      hotelDetails.push({name: hotel.name + (hotel.sub?` (${hotel.sub})`:''), nights:hn, rooms, unitPrice, cost, season:hotel.custom?'-':(season==='high'?'성수기':'비수기')});
+    }
+    if(infoEl){
+      infoEl.textContent = hn > 0
+        ? `${hotel.custom ? '직접입력 단가' : (season==='high'?'성수기':'비수기')} · 객실 ${rooms}개 × ${hn}박`
+        : '박수 0 → 미적용';
+    }
+  });
+
+  /* ── 차량 (인원수 자동배정) ── */
+  const vRule = getVehicleRule(persons);
+  const vCostUSD = vRule.rate * vdays;
+  const vInfo = document.getElementById('vehicle-info');
+  if(vInfo) vInfo.textContent = `🚐 ${persons}명 → ${vRule.type} 자동배정 · ${vdays}일 이용`;
+
+  /* ── 가이드 (인원수 자동배정) ── */
+  const guideCount = getGuideCount(persons);
+  const guideSel = document.getElementById('guide-select');
+  const guideItem = PRICE.guide.find(g=>g.id===(guideSel?guideSel.value:'g01')) || PRICE.guide[0];
+  const guideCostUSD = guideItem.price * vdays * guideCount;
+  const gInfo = document.getElementById('guide-info');
+  if(gInfo) gInfo.textContent = `🧑‍💼 ${persons}명 → ${guideCount}명 자동배정 · ${guideItem.name} · ${vdays}일 이용`;
+
+  /* ── 식사 (수량 직접입력) ── */
+  let mealsUSD = 0;
+  const mealDetails = [];
+  Object.keys(mealCounts).forEach(id=>{
+    const cnt = mealCounts[id];
+    if(cnt > 0){
+      const item = findItem(id);
+      if(item){
+        const price = roundMealPrice(item.price);
+        const cost = price * cnt;
+        mealsUSD += cost;
+        mealDetails.push({name:item.name, cnt, price, cost});
+      }
+    }
+  });
+
+  /* ── 입장료 / 옵션투어 / 스파 (체크박스 선택) ── */
+  function sumSel(set, list){
+    let sum = 0;
+    set.forEach(id=>{
+      const item = findItem(id);
+      if(item){
+        const mult = unitMultiplier(item, persons);
+        const cost = item.price * mult;
+        sum += cost;
+        if(list) list.push({name:item.name, price:item.price, unit:item.unit||'인', mult, cost});
+      }
+    });
+    return sum;
+  }
+  const admDetails = [], tourDetails = [], spaDetails = [];
+  const admUSD  = sumSel(admSel,  admDetails);
+  const tourUSD = sumSel(tourSel, tourDetails);
+  const spaUSD  = sumSel(spaSel,  spaDetails);
+
+  /* ── 기타 (노쇼핑·공동경비 / 현지여행사 서비스수수료, 1인당 고정) ── */
+  const noshopRate = NOSHOP_RATE_FIXED;
+  const noshopUSD = noshopRate * persons;
+  const localFeeRate = LOCAL_AGENCY_FEE;
+  const localFeeUSD = localFeeRate * persons;
+
+  /* ── 총합 ── */
+  const totalUSD = hotelTotalUSD + vCostUSD + guideCostUSD + mealsUSD + admUSD + tourUSD + spaUSD + noshopUSD + localFeeUSD;
+  const totalKRW = totalUSD * exchange;
+  const perKRW   = totalKRW / persons;
+
+  const margin = tripType === 'honeymoon' ? MARGIN_HONEYMOON : MARGIN_FAMILY;
+  const selling = roundUp5000(perKRW + margin);
+  const sellingTotal = selling * persons;
+
+  const airPer = getV('air-per');
+  const airTotal = airPer * persons;
+  const grandFinal = sellingTotal + airTotal;
+
+  /* ── 결과 테이블 ── */
+  const rows = [
+    ['🏨 호텔비', hotelTotalUSD],
+    ['🚐 차량비', vCostUSD],
+    ['🧑‍💼 가이드비', guideCostUSD],
+    ['🍽 식사', mealsUSD],
+    ['🎫 관광지·입장료', admUSD],
+    ['🌊 옵션투어', tourUSD],
+    ['💆 스파·마사지', spaUSD],
+    [`➕ 노쇼핑·공동경비 ($${noshopRate}/인)`, noshopUSD],
+    [`🏢 현지여행사 서비스수수료 ($${localFeeRate}/인)`, localFeeUSD],
+  ];
+  const tbody = document.getElementById('result-rows');
+  tbody.innerHTML = rows.map(([label,usd])=>{
+    const krw = usd * exchange;
+    const z = usd === 0 ? ' zero' : '';
+    return `<tr><td>${label}</td><td class="usd-col${z}">${fmtUSD(usd)}</td><td class="krw-col${z}">${fmtKRW(krw)}</td></tr>`;
+  }).join('');
+
+  document.getElementById('r-total-usd').textContent = fmtUSD(totalUSD);
+  document.getElementById('r-total-krw').textContent = fmtKRW(totalKRW);
+  document.getElementById('r-per-krw').textContent   = fmtKRW(perKRW);
+  document.getElementById('r-margin').textContent    = fmtKRW(margin) + ' /인';
+  document.getElementById('r-selling').textContent   = fmtKRW(selling);
+  document.getElementById('r-selling-sub').textContent =
+    `= 1인당원가 ${fmtKRW(perKRW)} + 여행사수수료 ${fmtKRW(margin)} → 5천원 단위 올림`;
+  document.getElementById('r-badge').textContent =
+    `${persons}명 · ${tripType==='honeymoon' ? '💑 허니문' : '👨‍👩‍👧‍👦 가족/일반여행'} 기준`;
+  document.getElementById('r-air-per').textContent   = fmtKRW(airPer);
+  document.getElementById('r-air-total').textContent = fmtKRW(airTotal);
+  document.getElementById('r-grand-total').textContent = fmtKRW(grandFinal);
+  document.getElementById('r-grand-sub').textContent =
+    `= 1인당 ${fmtKRW(selling)} × ${persons}명 + 항공료 ${fmtKRW(airTotal)}`;
+  document.getElementById('result-subtitle').textContent =
+    `${persons}명 · ${nights}박${nights+1}일 · ${tripType==='honeymoon' ? '허니문' : '가족/일반여행'}`;
+
+  /* 모바일 하단바 */
+  document.getElementById('mb-label').textContent = `${persons}명 · 1인당 판매가 (지상비)`;
+  document.getElementById('mb-price').textContent = fmtKRW(selling) + ' /인';
+
+  /* 복사/인쇄/이미지용 캐시 */
+  window._motBaliResult = {
+    persons, nights, exchange, vdays, tripType,
+    hotelTotalUSD, hotelDetails,
+    vCostUSD, vRule,
+    guideCostUSD, guideItem, guideCount,
+    mealsUSD, mealDetails,
+    admUSD, admDetails,
+    tourUSD, tourDetails,
+    spaUSD, spaDetails,
+    noshopUSD, noshopRate, localFeeUSD, localFeeRate,
+    totalUSD, totalKRW, perKRW, margin, selling, sellingTotal,
+    airPer, airTotal, grandFinal, rows,
+  };
+}
+
+/* ════════════════════════════════════════════════════════════
+   v2: 패키지 선택 / 일정표 / 계산기 화면 전환
+   ════════════════════════════════════════════════════════════ */
+let currentPkg = null;
+
+function renderPackages(){
+  const wrap = document.getElementById('package-list');
+  if(!wrap) return;
+  wrap.innerHTML = PACKAGES.map(p=>`
+    <div class="package-card" onclick="selectPackage('${p.id}')">
+      <div class="package-card-top">
+        <div class="package-card-badge">${p.badge}</div>
+        <div class="package-card-title">${p.title}</div>
+        <div class="package-card-sub">${p.subtitle}</div>
+      </div>
+      <div class="package-card-body">
+        <div class="package-card-meta"><span>👥 ${p.persons}인 기준</span><span>🗓 ${p.nights}박${p.nights+1}일</span></div>
+        <ul class="package-highlights">${p.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>
+        <div class="package-card-cta">📋 일정표 보기</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+window.selectPackage = function(id){
+  const pkg = PACKAGES.find(p=>p.id===id);
+  if(!pkg) return;
+  currentPkg = pkg;
+
+  document.getElementById('itinerary-header').innerHTML = `
+    <div class="badge2">${pkg.badge}</div>
+    <h2>${pkg.title}</h2>
+    <div class="sub">${pkg.subtitle}<br>👥 ${pkg.persons}인 기준 · 🗓 ${pkg.nights}박${pkg.nights+1}일 (실제 인원·일정은 다음 화면에서 변경 가능)</div>
+  `;
+
+  document.getElementById('itinerary-days').innerHTML = pkg.days.map(d=>`
+    <div class="day-card">
+      <div class="day-num"><div class="d-label">DAY</div><div class="d-num">${d.day}</div></div>
+      <div class="day-body">
+        <div class="day-title-row">
+          <div class="day-title">${d.title}</div>
+          ${d.hotel && d.hotel!=='-' ? `<div class="day-hotel">🏨 ${d.hotel}</div>` : ''}
+        </div>
+        <ul class="day-items">${d.items.map(i=>`<li>${i}</li>`).join('')}</ul>
+        <div class="day-meals">
+          <span>조식 <b>${d.meals.b}</b></span>
+          <span>중식 <b>${d.meals.l}</b></span>
+          <span>석식 <b>${d.meals.d}</b></span>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
+  document.getElementById('package-view').style.display = 'none';
+  document.getElementById('itinerary-view').style.display = '';
+  document.getElementById('calculator-view').style.display = 'none';
+  window.scrollTo(0,0);
+};
+
+window.backToPackages = function(){
+  document.getElementById('itinerary-view').style.display = 'none';
+  document.getElementById('calculator-view').style.display = 'none';
+  document.getElementById('package-view').style.display = '';
+  window.scrollTo(0,0);
+};
+
+window.showCalculator = function(){
+  document.getElementById('package-view').style.display = 'none';
+  document.getElementById('itinerary-view').style.display = 'none';
+  document.getElementById('calculator-view').style.display = '';
+  window.scrollTo(0,0);
+};
+
+window.startWithPackage = function(){
+  if(!currentPkg) return;
+  applyPackagePreset(currentPkg);
+  showCalculator();
+};
+
+/* 패키지 프리셋 → 계산기 입력값 자동 반영 */
+function applyPackagePreset(pkg){
+  const preset = pkg.preset;
+
+  // 여행유형 전환 (마진 산출 기준)
+  tripType = pkg.tripType;
+  document.querySelectorAll('#mot-bali-wrap .region-tab').forEach((el,i)=>{
+    el.classList.toggle('active', (i===0 && tripType==='honeymoon') || (i===1 && tripType==='family'));
+  });
+
+  // 선택 상태 초기화 후 프리셋 값으로 채움
+  mealCounts = {};
+  admSel  = new Set(preset.admission || []);
+  tourSel = new Set(preset.tours || []);
+  spaSel  = new Set(preset.spa || []);
+  guideId = preset.guideId || 'g01';
+  hotel1Custom = 0;
+  hotel2Custom = 0;
+
+  // 패널을 새로 빌드한 뒤, DOM 값들을 프리셋으로 설정
+  buildPanel();
+
+  document.getElementById('persons').value = pkg.persons;
+  document.getElementById('nights').value  = pkg.nights;
+  document.getElementById('vdays').value   = pkg.nights;
+
+  // 호텔 1 (필수)
+  document.getElementById('hotel1-select').value = preset.hotel1.id;
+  document.getElementById('hotel1-nights').value = preset.hotel1.nights;
+  document.getElementById('hotel1-season').value = preset.hotel1.season;
+
+  // 호텔 2 (선택)
+  const h2 = preset.hotel2;
+  if(h2 && h2.id){
+    document.getElementById('hotel2-select').value = h2.id;
+    document.getElementById('hotel2-nights').value = h2.nights;
+    document.getElementById('hotel2-season').value = h2.season;
+  } else {
+    document.getElementById('hotel2-nights').value = 0;
+  }
+
+  // 가이드
+  const guideSel = document.getElementById('guide-select');
+  if(guideSel) guideSel.value = guideId;
+
+  // 식사 수량
+  Object.keys(preset.meals || {}).forEach(id=>{
+    mealCounts[id] = preset.meals[id];
+    const span = document.getElementById('mc-'+id);
+    if(span) span.textContent = mealCounts[id];
+    const row = document.getElementById('meal-row-'+id);
+    if(row) row.classList.toggle('selected', mealCounts[id] > 0);
+  });
+  renderSelectedMeals();
+
+  // 입장료/옵션투어/스파 체크박스 표시 동기화
+  [admSel, tourSel, spaSel].forEach(set=>{
+    set.forEach(id=>{
+      const label = document.getElementById('opt-'+id);
+      if(label){
+        const cb = label.querySelector('input[type="checkbox"]');
+        if(cb) cb.checked = true;
+        label.classList.add('selected');
+      }
+    });
+  });
+  renderSelectedOptions('adm');
+  renderSelectedOptions('tour');
+  renderSelectedOptions('spa');
+
+  calc();
+}
+
+/* ════════════════════════════════════════════════════════════
+   결과 복사 (클립보드)
+   ════════════════════════════════════════════════════════════ */
+window.copyResult = function(){
+  const r = window._motBaliResult;
+  if(!r) return;
+  const lines = [];
+  lines.push(`■ 마이온트래블 발리 견적 (${r.tripType==='honeymoon'?'허니문':'가족/일반여행'})`);
+  lines.push(`인원 ${r.persons}명 · ${r.nights}박${r.nights+1}일 · 환율 ${r.exchange.toLocaleString()}원`);
+  lines.push('');
+  r.rows.forEach(([label,usd])=>{
+    lines.push(`${label}: ${fmtUSD(usd)} (${fmtKRW(usd*r.exchange)})`);
+  });
+  lines.push('');
+  lines.push(`총 지상비: ${fmtUSD(r.totalUSD)} = ${fmtKRW(r.totalKRW)}`);
+  lines.push(`1인당 원가: ${fmtKRW(r.perKRW)}`);
+  lines.push(`여행사수수료(1인): ${fmtKRW(r.margin)}`);
+  lines.push(`1인당 판매가(지상비): ${fmtKRW(r.selling)}`);
+  lines.push(`항공료(1인): ${fmtKRW(r.airPer)}  /  항공료 합계: ${fmtKRW(r.airTotal)}`);
+  lines.push(`────────────────`);
+  lines.push(`최종 총 판매가: ${fmtKRW(r.grandFinal)}`);
+  const text = lines.join('\n');
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(text).then(()=>alert('견적 결과가 클립보드에 복사되었습니다.'))
+      .catch(()=>fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+};
+function fallbackCopy(text){
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position='fixed'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.select();
+  try{ document.execCommand('copy'); alert('견적 결과가 클립보드에 복사되었습니다.'); }catch(e){ alert('복사에 실패했습니다.'); }
+  document.body.removeChild(ta);
+}
+
+/* ════════════════════════════════════════════════════════════
+   인쇄 미리보기 / 인쇄 / 이미지 저장
+   ════════════════════════════════════════════════════════════ */
+function buildPrintContentHtml(){
+  const r = window._motBaliResult;
+  if(!r) return '';
+  const today = new Date();
+  const dateStr = `${today.getFullYear()}.${String(today.getMonth()+1).padStart(2,'0')}.${String(today.getDate()).padStart(2,'0')}`;
+
+  let detailRows = '';
+  r.hotelDetails.forEach(h=>{
+    detailRows += `<tr><td>🏨 ${h.name} (${h.season}, ${h.nights}박×${h.rooms}룸)</td><td class="r">${fmtUSD(h.unitPrice)}</td><td class="r bold">${fmtKRW(h.cost*r.exchange)}</td></tr>`;
+  });
+  detailRows += `<tr><td>🚐 차량비 (${r.vRule.type} × ${r.vdays}일)</td><td class="r">${fmtUSD(r.vCostUSD)}</td><td class="r bold">${fmtKRW(r.vCostUSD*r.exchange)}</td></tr>`;
+  detailRows += `<tr><td>🧑‍💼 가이드비 (${r.guideItem.name} × ${r.guideCount}명 × ${r.vdays}일)</td><td class="r">${fmtUSD(r.guideCostUSD)}</td><td class="r bold">${fmtKRW(r.guideCostUSD*r.exchange)}</td></tr>`;
+  r.mealDetails.forEach(m=>{
+    detailRows += `<tr><td>🍽 ${m.name} × ${m.cnt}</td><td class="r">${fmtUSD(m.cost)}</td><td class="r bold">${fmtKRW(m.cost*r.exchange)}</td></tr>`;
+  });
+  r.admDetails.forEach(a=>{
+    detailRows += `<tr><td>🎫 ${a.name}</td><td class="r">${fmtUSD(a.cost)}</td><td class="r bold">${fmtKRW(a.cost*r.exchange)}</td></tr>`;
+  });
+  r.tourDetails.forEach(t=>{
+    detailRows += `<tr><td>🌊 ${t.name}</td><td class="r">${fmtUSD(t.cost)}</td><td class="r bold">${fmtKRW(t.cost*r.exchange)}</td></tr>`;
+  });
+  r.spaDetails.forEach(s=>{
+    detailRows += `<tr><td>💆 ${s.name}</td><td class="r">${fmtUSD(s.cost)}</td><td class="r bold">${fmtKRW(s.cost*r.exchange)}</td></tr>`;
+  });
+  detailRows += `<tr><td>➕ 노쇼핑·공동경비 ($${r.noshopRate}/인 × ${r.persons}명)</td><td class="r">${fmtUSD(r.noshopUSD)}</td><td class="r bold">${fmtKRW(r.noshopUSD*r.exchange)}</td></tr>`;
+  detailRows += `<tr><td>🏢 현지여행사 서비스수수료 ($${r.localFeeRate}/인 × ${r.persons}명)</td><td class="r">${fmtUSD(r.localFeeUSD)}</td><td class="r bold">${fmtKRW(r.localFeeUSD*r.exchange)}</td></tr>`;
+
+  return `
+    <div class="pq-meta">
+      <div><strong>여행유형</strong> : ${r.tripType==='honeymoon'?'💑 허니문':'👨‍👩‍👧‍👦 가족/일반여행'}</div>
+      <div><strong>인원</strong> : ${r.persons}명 &nbsp; | &nbsp; <strong>일정</strong> : ${r.nights}박${r.nights+1}일</div>
+      <div><strong>적용환율</strong> : ${r.exchange.toLocaleString()}원/USD &nbsp; | &nbsp; <strong>견적일자</strong> : ${dateStr}</div>
+    </div>
+    <table class="pq-table">
+      <thead><tr><th>항목</th><th>USD</th><th>원화</th></tr></thead>
+      <tbody>${detailRows}</tbody>
+    </table>
+    <hr class="pq-divider">
+    <div class="pq-total-box">
+      <div class="total-row"><span class="total-label">총 지상비</span><span class="total-value">${fmtUSD(r.totalUSD)} = ${fmtKRW(r.totalKRW)}</span></div>
+      <div class="total-row"><span class="total-label">1인당 원가</span><span class="total-value">${fmtKRW(r.perKRW)}</span></div>
+      <div class="total-row"><span class="total-label">여행사수수료 (1인)</span><span class="total-value">${fmtKRW(r.margin)}</span></div>
+    </div>
+    <div class="pq-sell-box">
+      <div class="pq-sell-label">1인당 판매가 (지상비)</div>
+      <div class="pq-sell-price">${fmtKRW(r.selling)}</div>
+    </div>
+    <div class="pq-total-box">
+      <div class="total-row"><span class="total-label">✈️ 항공료 (1인 / 합계)</span><span class="total-value">${fmtKRW(r.airPer)} / ${fmtKRW(r.airTotal)}</span></div>
+    </div>
+    <div class="pq-sell-box" style="background:linear-gradient(135deg,#92400e,#facc15)">
+      <div class="pq-sell-label">최종 총 판매가 (${r.persons}명, 지상비+항공료)</div>
+      <div class="pq-sell-price">${fmtKRW(r.grandFinal)}</div>
+    </div>
+    <div class="pq-notes">
+      ※ 본 견적은 환율 변동, 현지 시즌(성수기/비수기), 선택 항목에 따라 변경될 수 있습니다.<br>
+      ※ 항공료는 별도 확정 후 합산되며, 상기 금액은 참고용입니다.<br>
+      ※ MYOWNTRAVEL · ${dateStr} 발행
+    </div>
+  `;
+}
+
+window.showPrintPreview = function(){
+  calc();
+  document.getElementById('print-content').innerHTML = buildPrintContentHtml();
+  document.getElementById('print-overlay').style.display = 'block';
+};
+window.closePrintPreview = function(){
+  document.getElementById('print-overlay').style.display = 'none';
+};
+window.doPrint = function(){
+  window.print();
+};
+
+/* 결과 이미지 저장 (html2canvas) */
+window.saveAsImage = function(){
+  calc();
+  const wrap = document.getElementById('mot-bali-wrap');
+  const tempWrap = document.createElement('div');
+  tempWrap.style.position = 'fixed';
+  tempWrap.style.left = '-9999px';
+  tempWrap.style.top = '0';
+  tempWrap.style.width = '520px';
+  tempWrap.style.background = '#fff';
+  tempWrap.innerHTML = `
+    <div class="print-modal" style="box-shadow:none">
+      <div class="print-modal-header">
+        <h2>🌴 마이온트래블 발리 견적서</h2>
+      </div>
+      <div id="print-content-temp">${buildPrintContentHtml()}</div>
+    </div>
+  `;
+  wrap.appendChild(tempWrap);
+  html2canvas(tempWrap, {scale:2, backgroundColor:'#ffffff'}).then(canvas=>{
+    wrap.removeChild(tempWrap);
+    const link = document.createElement('a');
+    link.download = `마이온트래블_발리견적_${Date.now()}.png`;
+    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    if(isMobile){
+      canvas.toBlob(blob=>{
+        const url = URL.createObjectURL(blob);
+        window.open(url, '_blank');
+      });
+    } else {
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  }).catch(()=>{
+    if(wrap.contains(tempWrap)) wrap.removeChild(tempWrap);
+    alert('이미지 생성에 실패했습니다.');
+  });
+};
+
+/* ════════════════════════════════════════════════════════════
+   모바일 결과 시트 열기/닫기
+   ════════════════════════════════════════════════════════════ */
+window.openSheet = function(){
+  document.querySelector('.result-panel').classList.add('sheet-open');
+  document.getElementById('sheet-overlay').classList.add('open');
+};
+window.closeSheet = function(){
+  document.querySelector('.result-panel').classList.remove('sheet-open');
+  document.getElementById('sheet-overlay').classList.remove('open');
+};
+
+/* ════════════════════════════════════════════════════════════
+   실시간 환율 조회 (KRW/USD) - 외부 API 연동, 입력란은 읽기전용
+   ════════════════════════════════════════════════════════════ */
+window.refreshExchangeRate = async function(){
+  const input = document.getElementById('exchange');
+  const statusEl = document.getElementById('exchange-status');
+  if(!input) return;
+  if(statusEl) statusEl.textContent = '⏳ 조회중...';
+
+  const t = new Date();
+  const hh = String(t.getHours()).padStart(2,'0');
+  const mm = String(t.getMinutes()).padStart(2,'0');
+
+  /* 1순위: Frankfurter (키 불필요, ECB 기준, CORS 허용) */
+  try{
+    const res = await fetch('https://api.frankfurter.app/latest?from=USD&to=KRW');
+    const data = await res.json();
+    const krw = data && data.rates && data.rates.KRW;
+    if(!krw) throw new Error('frankfurter 데이터 없음');
+    input.value = Math.round(krw);
+    if(statusEl) statusEl.textContent = `✅ 실시간 (${hh}:${mm} 기준 · ECB)`;
+    calc();
+    return;
+  }catch(e1){
+    /* 2순위: open.er-api (fallback) */
+    try{
+      const res2 = await fetch('https://open.er-api.com/v6/latest/USD');
+      const data2 = await res2.json();
+      const krw2 = data2 && data2.rates && data2.rates.KRW;
+      if(!krw2) throw new Error('er-api 데이터 없음');
+      input.value = Math.round(krw2);
+      if(statusEl) statusEl.textContent = `✅ 실시간 (${hh}:${mm} 기준)`;
+      calc();
+      return;
+    }catch(e2){
+      if(statusEl) statusEl.textContent = '⚠️ 조회 실패 (기본값 적용)';
+    }
+  }
+};
+
+/* ════════════════════════════════════════════════════════════
+   초기화
+   ════════════════════════════════════════════════════════════ */
+renderPackages();
+buildPanel();
+calc();
+refreshExchangeRate();
+})();
+</script>
+<!-- /* ════════════════════════�
