@@ -2076,6 +2076,15 @@ window.saveAsImage = async function(){
 window.openSheet = function(){
   document.querySelector('.result-panel').classList.add('sheet-open');
   document.getElementById('sheet-overlay').classList.add('open');
+  /* 시트가 화면에 보이도록 부모 페이지에 스크롤 위치 전달
+     (iframe이 자체 스크롤 없이 전체 높이로 렌더링되므로,
+      시트의 iframe 내부 좌표를 부모가 받아 페이지 스크롤을 옮겨줘야 함) */
+  requestAnimationFrame(()=>{
+    const sheet = document.querySelector('.result-panel.sheet-open');
+    if(!sheet) return;
+    const rect = sheet.getBoundingClientRect();
+    try{ window.parent.postMessage({type:'mot-bali-scrollto', top: rect.top}, '*'); }catch(e){}
+  });
 };
 window.closeSheet = function(){
   document.querySelector('.result-panel').classList.remove('sheet-open');
