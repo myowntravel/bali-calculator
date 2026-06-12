@@ -429,46 +429,458 @@
 const CATALOG = {
   exchange: 1480, // 기본 환율 (서버 응답으로 갱신됨)
 
-  /* ⑦ 호텔 (33개, 2인1실 BB 기준, 비수기/성수기 USD) ───────────── */
+  /* ⑦ 호텔 (449개 객실타입, 코리아트래블 루피아 계약 원가표 기준, 2026-06-12 업데이트) ───────── */
   hotels: [
-    {id:'h01',region:'꾸따·레기안',name:'하드락 호텔 발리',sub:'Superior'},
-    {id:'h02',region:'꾸따·레기안',name:'하드락 호텔 발리',sub:'Deluxe Pool View'},
-    {id:'h03',region:'꾸따·레기안',name:'꾸따비치 헤리티지',sub:'Superior'},
-    {id:'h04',region:'꾸따·레기안',name:'디스커버리 카르티카 플라자',sub:'Superior'},
-    {id:'h05',region:'꾸따·레기안',name:'라마야나 리조트',sub:'Deluxe'},
-    {id:'h06',region:'꾸따·레기안',name:'꾸따 팔라스 헤리티지',sub:'Standard'},
-    {id:'h07',region:'꾸따·레기안',name:'팝스 호텔 꾸따',sub:'Standard'},
-    {id:'h08',region:'꾸따·레기안',name:'아스타나 산티 리조트',sub:'Standard'},
-    {id:'h09',region:'누사두아',name:'웨스틴 리조트 발리',sub:'Deluxe'},
-    {id:'h10',region:'누사두아',name:'메리어트 발리 누사두아',sub:'Deluxe'},
-    {id:'h11',region:'누사두아',name:'샹그릴라 라사 사양',sub:'Deluxe'},
-    {id:'h12',region:'누사두아',name:'힐튼 발리 리조트',sub:'Deluxe Ocean'},
-    {id:'h13',region:'누사두아',name:'아마누사',sub:'Suite'},
-    {id:'h14',region:'누사두아',name:'메리아 발리',sub:'Standard'},
-    {id:'h15',region:'누사두아',name:'더 그랜드 호텔 발리',sub:'Standard'},
-    {id:'h16',region:'누사두아',name:'사우스 스퀘어 호텔',sub:'Standard'},
-    {id:'h17',region:'스미냑·짱구',name:'더블유 발리 스미냑',sub:'Marvelous Suite'},
-    {id:'h18',region:'스미냑·짱구',name:'알라야 리조트 스미냑',sub:'Deluxe'},
-    {id:'h19',region:'스미냑·짱구',name:'아난타라 스미냑',sub:'Deluxe'},
-    {id:'h20',region:'스미냑·짱구',name:'더 레이아우 발리',sub:'Villa'},
-    {id:'h21',region:'스미냑·짱구',name:'쿠 드 따 스미냑',sub:'Deluxe'},
-    {id:'h22',region:'스미냑·짱구',name:'더 비치 하우스 짱구',sub:'Standard'},
-    {id:'h23',region:'우붓',name:'포시즌스 리조트 우붓',sub:'Suite'},
-    {id:'h24',region:'우붓',name:'아야나 리조트 우붓 (Sayan)',sub:'Deluxe'},
-    {id:'h25',region:'우붓',name:'알라야 리조트 우붓',sub:'Deluxe'},
-    {id:'h26',region:'우붓',name:'코마네카 앳 비사마',sub:'Suite'},
-    {id:'h27',region:'우붓',name:'카펠라 우붓',sub:'Tent'},
-    {id:'h28',region:'우붓',name:'코코 우붓 리조트',sub:'Standard'},
-    {id:'h29',region:'우붓',name:'더 로얄 피타마하',sub:'Deluxe'},
-    {id:'h30',region:'우붓',name:'보다 발리 우붓',sub:'Standard'},
-    {id:'h31',region:'기타(로비나·탄조크아멧)',name:'더 파라다이스 리조트 로비나',sub:'Deluxe'},
-    {id:'h32',region:'기타(로비나·탄조크아멧)',name:'다마이 로비나 빌라',sub:'Villa'},
-    {id:'h33',region:'기타(로비나·탄조크아멧)',name:'워터블로우 리조트',sub:'Standard'},
-    /* ── v2 패키지 전용 추가 호텔 (코리아트래블 요금표 기준, 2026 확정 일정 매칭) ── */
-    {id:'h34',region:'짐바란',name:'림바 짐바란 바이 아야나 리조트',sub:'Resort View Room (조식포함)'},
-    {id:'h35',region:'우붓',name:'더 카욘정글 리조트',sub:'Jungle Pool Villa'},
-    {id:'h36',region:'누사두아',name:'더 아푸르바 켐핀스키 발리 리조트',sub:'Cliff Private Pool Junior Suite (풀빌라)'},
-    {id:'h99',region:'기타',name:'기타 호텔 (직접입력)',sub:'1박 1실 단가(USD) 직접 입력 — 림바짐바란/카욘정글 등',custom:true},
+    {id:'h001',region:'꾸따·레기안',name:'ALOFT KUTA',sub:'Aloft Garden View'},
+    {id:'h002',region:'꾸따·레기안',name:'ALOFT KUTA',sub:'Aloft Pool View'},
+    {id:'h003',region:'꾸따·레기안',name:'ALOFT KUTA',sub:'Aloft Room'},
+    {id:'h004',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Deluxe Premier Room'},
+    {id:'h005',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Deluxe Room'},
+    {id:'h006',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Executive Room'},
+    {id:'h007',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Family Room'},
+    {id:'h008',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Grand Deluxe Premier Room'},
+    {id:'h009',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Grand Deluxe Room'},
+    {id:'h010',region:'꾸따·레기안',name:'ARYADUTA BALI',sub:'Superior Room'},
+    {id:'h011',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Deluxe'},
+    {id:'h012',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Deluxe Family Room'},
+    {id:'h013',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Deluxe Interconnecting'},
+    {id:'h014',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Deluxe Pool View'},
+    {id:'h015',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Family Garden View'},
+    {id:'h016',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Family Lagoon Pool Access'},
+    {id:'h017',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Family Pool View'},
+    {id:'h018',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Family Studio Room'},
+    {id:'h019',region:'꾸따·레기안',name:'BALI DYNASTY',sub:'Kids Suite'},
+    {id:'h020',region:'꾸따·레기안',name:'FAIRFIELD Legian by Marriott',sub:'Deluxe Pool View'},
+    {id:'h021',region:'꾸따·레기안',name:'FAIRFIELD Legian by Marriott',sub:'Deluxe Room'},
+    {id:'h022',region:'꾸따·레기안',name:'FOUR POINT KUTA',sub:'Deluxe Lagoon Access'},
+    {id:'h023',region:'꾸따·레기안',name:'FOUR POINT KUTA',sub:'Deluxe Lagoon View'},
+    {id:'h024',region:'꾸따·레기안',name:'FOUR POINT KUTA',sub:'Deluxe Pool View'},
+    {id:'h025',region:'꾸따·레기안',name:'FOUR POINT KUTA',sub:'Leisure Suite'},
+    {id:'h026',region:'꾸따·레기안',name:'HARD ROCK',sub:'Deluxe'},
+    {id:'h027',region:'꾸따·레기안',name:'HARD ROCK',sub:'Deluxe Premium'},
+    {id:'h028',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Harris Room'},
+    {id:'h029',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Harris Room Garden Access'},
+    {id:'h030',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Harris Suite'},
+    {id:'h031',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Harris Unique'},
+    {id:'h032',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Harris Unique Pool Access'},
+    {id:'h033',region:'꾸따·레기안',name:'HARRIS TUBAN',sub:'Sofa Bed Harris Suite only'},
+    {id:'h034',region:'꾸따·레기안',name:'PADMA LEGIAN',sub:'Deluxe Chalet'},
+    {id:'h035',region:'꾸따·레기안',name:'PADMA LEGIAN',sub:'Deluxe Lagoon View'},
+    {id:'h036',region:'꾸따·레기안',name:'PADMA LEGIAN',sub:'Deluxe Room'},
+    {id:'h037',region:'꾸따·레기안',name:'PADMA LEGIAN',sub:'Garden Club Chalet'},
+    {id:'h038',region:'꾸따·레기안',name:'PADMA LEGIAN',sub:'Premier Double Double'},
+    {id:'h039',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Guest Room'},
+    {id:'h040',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Guest Room Garden View'},
+    {id:'h041',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Guest Room Ocean View'},
+    {id:'h042',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Guest Room Partial Ocean View'},
+    {id:'h043',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Junior Family Suite'},
+    {id:'h044',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Junior Suite Ocean View'},
+    {id:'h045',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Larger Suite Garden View'},
+    {id:'h046',region:'꾸따·레기안',name:'SHERATON KUTA',sub:'Larger Suite Oceanfront'},
+    {id:'h047',region:'꾸따·레기안',name:'THE STONES',sub:'Autograph Suite'},
+    {id:'h048',region:'꾸따·레기안',name:'THE STONES',sub:'Deluxe Corner'},
+    {id:'h049',region:'꾸따·레기안',name:'THE STONES',sub:'Deluxe Pool View'},
+    {id:'h050',region:'꾸따·레기안',name:'THE STONES',sub:'Deluxe Room'},
+    {id:'h051',region:'꾸따·레기안',name:'THE STONES',sub:'Deluxe Suite'},
+    {id:'h052',region:'꾸따·레기안',name:'THE STONES',sub:'Junior Suite'},
+    {id:'h053',region:'꾸따·레기안',name:'THE STONES',sub:'Pool Suite'},
+    {id:'h054',region:'꾸따·레기안',name:'THE STONES',sub:'Premium Plunge Pool'},
+    {id:'h055',region:'꾸따·레기안',name:'THE STONES',sub:'Selling Period: imm - 30 June 2024'},
+    {id:'h056',region:'누사두아',name:'AYODYA',sub:'3Bedroom Family Suite'},
+    {id:'h057',region:'누사두아',name:'AYODYA',sub:'Add Person Adult'},
+    {id:'h058',region:'누사두아',name:'AYODYA',sub:'Ayodya Palace'},
+    {id:'h059',region:'누사두아',name:'AYODYA',sub:'Classic Deluxe'},
+    {id:'h060',region:'누사두아',name:'AYODYA',sub:'Classic Family'},
+    {id:'h061',region:'누사두아',name:'AYODYA',sub:'Classic Grande'},
+    {id:'h062',region:'누사두아',name:'AYODYA',sub:'Family Interconnecting'},
+    {id:'h063',region:'누사두아',name:'AYODYA',sub:'Suite Collections'},
+    {id:'h064',region:'누사두아',name:'Anagata Hotel Tanjung Benoa 4*',sub:'Anagata Suite'},
+    {id:'h065',region:'누사두아',name:'Anagata Hotel Tanjung Benoa 4*',sub:'Family Room'},
+    {id:'h066',region:'누사두아',name:'Anagata Hotel Tanjung Benoa 4*',sub:'Family Suite'},
+    {id:'h067',region:'누사두아',name:'Anagata Hotel Tanjung Benoa 4*',sub:'Premium Room'},
+    {id:'h068',region:'누사두아',name:'COURTYARD NUSA DUA',sub:'Deluxe Garden View'},
+    {id:'h069',region:'누사두아',name:'COURTYARD NUSA DUA',sub:'Deluxe Pool View'},
+    {id:'h070',region:'누사두아',name:'COURTYARD NUSA DUA',sub:'Premium Deluxe'},
+    {id:'h071',region:'누사두아',name:'GRAND HYATT',sub:'Garden View Room'},
+    {id:'h072',region:'누사두아',name:'GRAND HYATT',sub:'Grand Club Deluxe Garden'},
+    {id:'h073',region:'누사두아',name:'GRAND HYATT',sub:'Grand Club Garden View'},
+    {id:'h074',region:'누사두아',name:'GRAND HYATT',sub:'Grand Room'},
+    {id:'h075',region:'누사두아',name:'GRAND HYATT',sub:'Ocean View Room'},
+    {id:'h076',region:'누사두아',name:'KEMPINSKI',sub:'Cliff Private Junior Suite'},
+    {id:'h077',region:'누사두아',name:'KEMPINSKI',sub:'Cliff Private Ocean Juniro Suite'},
+    {id:'h078',region:'누사두아',name:'KEMPINSKI',sub:'Cliff Private Pool Junior Suite'},
+    {id:'h079',region:'누사두아',name:'KEMPINSKI',sub:'Cliff Private Pool Ocean Junior Suite'},
+    {id:'h080',region:'누사두아',name:'KEMPINSKI',sub:'Grand Deluxe Lagoon Room'},
+    {id:'h081',region:'누사두아',name:'KEMPINSKI',sub:'Grand Deluxe Ocean Court Room'},
+    {id:'h082',region:'누사두아',name:'KEMPINSKI',sub:'Grand Deluxe Room'},
+    {id:'h083',region:'누사두아',name:'KEMPINSKI',sub:'Sriwijaya Two Bedroom Villa'},
+    {id:'h084',region:'누사두아',name:'MERCURE NUSA DUA',sub:'Deluxe Room'},
+    {id:'h085',region:'누사두아',name:'MERCURE NUSA DUA',sub:'Superior Room'},
+    {id:'h086',region:'누사두아',name:'MERUSAKA',sub:'Deluxe Garden'},
+    {id:'h087',region:'누사두아',name:'MERUSAKA',sub:'Deluxe Ocean'},
+    {id:'h088',region:'누사두아',name:'MERUSAKA',sub:'Deluxe Pool Access'},
+    {id:'h089',region:'누사두아',name:'MERUSAKA',sub:'Deluxe Room'},
+    {id:'h090',region:'누사두아',name:'MERUSAKA',sub:'Family Room'},
+    {id:'h091',region:'누사두아',name:'MERUSAKA',sub:'Suite Ocean Room'},
+    {id:'h092',region:'누사두아',name:'MERUSAKA',sub:'Suite Room'},
+    {id:'h093',region:'누사두아',name:'MERUSAKA',sub:'Two Bedroom Pool Villa'},
+    {id:'h094',region:'누사두아',name:'MERUSAKA',sub:'Two Bedroom Suite'},
+    {id:'h095',region:'누사두아',name:'MULIA',sub:'Family Villa - Garden View'},
+    {id:'h096',region:'누사두아',name:'MULIA',sub:'Family Villa - Ocean View'},
+    {id:'h097',region:'누사두아',name:'MULIA',sub:'Mulia Grandeur'},
+    {id:'h098',region:'누사두아',name:'MULIA',sub:'Mulia Grandeur - Deluxe'},
+    {id:'h099',region:'누사두아',name:'MULIA',sub:'Mulia Signature'},
+    {id:'h100',region:'누사두아',name:'MULIA',sub:'Mulia Signature - Lagoon Access'},
+    {id:'h101',region:'누사두아',name:'MULIA',sub:'Mulia Signature - Ocean Court'},
+    {id:'h102',region:'누사두아',name:'MULIA',sub:'One Bedroom Villa - Garden View'},
+    {id:'h103',region:'누사두아',name:'MULIA',sub:'One Bedroom Villa - Ocean View'},
+    {id:'h104',region:'누사두아',name:'MULIA',sub:'Royal Beachfront Lagoon Suite'},
+    {id:'h105',region:'누사두아',name:'MULIA',sub:'Royal Beachfront Suite'},
+    {id:'h106',region:'누사두아',name:'MULIA',sub:'Royal Lagoon Suite'},
+    {id:'h107',region:'누사두아',name:'MULIA',sub:'Royal Ocean Court Suite'},
+    {id:'h108',region:'누사두아',name:'MULIA',sub:'Royal Suite'},
+    {id:'h109',region:'누사두아',name:'MULIA',sub:'Royal Suite - Ocean Court Suite'},
+    {id:'h110',region:'누사두아',name:'MULIA',sub:'Royal Villa Garden View'},
+    {id:'h111',region:'누사두아',name:'MULIA',sub:'Royal Villa Ocean View'},
+    {id:'h112',region:'누사두아',name:'MULIA',sub:'The Baron Suite - Beachfront View'},
+    {id:'h113',region:'누사두아',name:'MULIA',sub:'The Baron Suite - Garden View Room'},
+    {id:'h114',region:'누사두아',name:'MULIA',sub:'The Earl Suite - Beachfront View'},
+    {id:'h115',region:'누사두아',name:'MULIA',sub:'The Earl Suite - Garden View'},
+    {id:'h116',region:'누사두아',name:'NUSA DUA BEACH HOTEL',sub:'Deluxe Room'},
+    {id:'h117',region:'누사두아',name:'NUSA DUA BEACH HOTEL',sub:'Premier Room'},
+    {id:'h118',region:'누사두아',name:'RENAISSANCE NUSA DUA',sub:'Deluxe'},
+    {id:'h119',region:'누사두아',name:'RITZ CARLTON',sub:'2BR Sky Villa with Private Pool'},
+    {id:'h120',region:'누사두아',name:'RITZ CARLTON',sub:'3BR Ritz Carlton Cliff Villa with Private Pool'},
+    {id:'h121',region:'누사두아',name:'RITZ CARLTON',sub:'Cliff Villa with Private Pool Partial Ocean View'},
+    {id:'h122',region:'누사두아',name:'RITZ CARLTON',sub:'Garden Villa With Private Pool'},
+    {id:'h123',region:'누사두아',name:'RITZ CARLTON',sub:'OBR Sky Villa with Private Pool'},
+    {id:'h124',region:'누사두아',name:'RITZ CARLTON',sub:'Sawangan Junior Suite'},
+    {id:'h125',region:'누사두아',name:'RITZ CARLTON',sub:'Sawangan Junior Suite with Pool Access'},
+    {id:'h126',region:'누사두아',name:'RITZ CARLTON',sub:'The Pavilion Signature Suite'},
+    {id:'h127',region:'누사두아',name:'RITZ CARLTON',sub:'The Ritz Carlton Suite'},
+    {id:'h128',region:'누사두아',name:'RITZ CARLTON',sub:'The Ritz Carlton Suite with Pool Access'},
+    {id:'h129',region:'누사두아',name:'TIJILI BENOA',sub:'Deluxe Courtyard'},
+    {id:'h130',region:'누사두아',name:'TIJILI BENOA',sub:'Deluxe Room'},
+    {id:'h131',region:'누사두아',name:'TIJILI BENOA',sub:'Deluxe Seaview Terrace'},
+    {id:'h132',region:'누사두아',name:'TIJILI BENOA',sub:'Deluxe Terrace'},
+    {id:'h133',region:'누사두아',name:'TIJILI BENOA',sub:'Delxue Room'},
+    {id:'h134',region:'누사두아',name:'WESTIN NUSA DUA',sub:'Deluxe Garden View'},
+    {id:'h135',region:'누사두아',name:'WESTIN NUSA DUA',sub:'Deluxe Pool'},
+    {id:'h136',region:'누사두아',name:'WESTIN NUSA DUA',sub:'Premium Room'},
+    {id:'h137',region:'스미냑·짱구',name:'ASTON CANGGU',sub:'Deluxe'},
+    {id:'h138',region:'스미냑·짱구',name:'ASTON CANGGU',sub:'Deluxe Lagoon View'},
+    {id:'h139',region:'스미냑·짱구',name:'ASTON CANGGU',sub:'Superior'},
+    {id:'h140',region:'스미냑·짱구',name:'FAIRFIELD Sunset Road by Marriott',sub:'Deluxe Room City View'},
+    {id:'h141',region:'스미냑·짱구',name:'FAIRFIELD Sunset Road by Marriott',sub:'Deluxe Room Pool View'},
+    {id:'h142',region:'스미냑·짱구',name:'FOUR POINT SEMINYAK',sub:'Deluxe'},
+    {id:'h143',region:'스미냑·짱구',name:'FOUR POINT SEMINYAK',sub:'Deluxe Pool View'},
+    {id:'h144',region:'스미냑·짱구',name:'GOYA BOUTIQUE',sub:'Breakfast Adult 6yo above'},
+    {id:'h145',region:'스미냑·짱구',name:'GOYA BOUTIQUE',sub:'Deluxe Suite'},
+    {id:'h146',region:'스미냑·짱구',name:'GOYA BOUTIQUE',sub:'One Bedroom Villa'},
+    {id:'h147',region:'스미냑·짱구',name:'GOYA BOUTIQUE',sub:'Two Bedroom Villa'},
+    {id:'h148',region:'스미냑·짱구',name:'GRAND MERCURE SEMINYAK',sub:'Deluxe Garden / Deluxe Pool'},
+    {id:'h149',region:'스미냑·짱구',name:'GRAND MERCURE SEMINYAK',sub:'Deluxe Room'},
+    {id:'h150',region:'스미냑·짱구',name:'HOLIDAY INN CANGGU',sub:'Premium Balcony'},
+    {id:'h151',region:'스미냑·짱구',name:'HOLIDAY INN CANGGU',sub:'Premium Balcony Ocean View'},
+    {id:'h152',region:'스미냑·짱구',name:'INDIGO SEMINYAK',sub:'Stanard Partial Ocean View'},
+    {id:'h153',region:'스미냑·짱구',name:'INDIGO SEMINYAK',sub:'Standard Courtyard Access'},
+    {id:'h154',region:'스미냑·짱구',name:'INDIGO SEMINYAK',sub:'Standard Garden View'},
+    {id:'h155',region:'스미냑·짱구',name:'INDIGO SEMINYAK',sub:'Standard Room'},
+    {id:'h156',region:'스미냑·짱구',name:'INDIGO SEMINYAK',sub:'Suite Garden View'},
+    {id:'h157',region:'스미냑·짱구',name:'PARADISUS',sub:'Family Concierge Junior Suite Garden View'},
+    {id:'h158',region:'스미냑·짱구',name:'PARADISUS',sub:'Family Concierge Junior Suite Lagoon Access'},
+    {id:'h159',region:'스미냑·짱구',name:'PARADISUS',sub:'Family Concierge Suite Duplex'},
+    {id:'h160',region:'스미냑·짱구',name:'PARADISUS',sub:'Junior Suite Garden View'},
+    {id:'h161',region:'스미냑·짱구',name:'PARADISUS',sub:'Junior Suite Lagoon Access'},
+    {id:'h162',region:'스미냑·짱구',name:'PARADISUS',sub:'Premium Room Garden View'},
+    {id:'h163',region:'스미냑·짱구',name:'PARADISUS',sub:'Suite Duplex'},
+    {id:'h164',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve 2 Bedroom Garden Villa'},
+    {id:'h165',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Garden Villa'},
+    {id:'h166',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Junior Suite Garden View'},
+    {id:'h167',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Junior Suite Lagoon Access'},
+    {id:'h168',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Master Suite'},
+    {id:'h169',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Master Suite Lagoon Access'},
+    {id:'h170',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Presidential Suite'},
+    {id:'h171',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Room Garden View'},
+    {id:'h172',region:'스미냑·짱구',name:'PARADISUS',sub:'The Reserve Suite Duplex'},
+    {id:'h173',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'1 Bedroom Pool Villa'},
+    {id:'h174',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'2 Bedroom Pool Villa'},
+    {id:'h175',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'3 Bedroom Presidential Pool Villa'},
+    {id:'h176',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'3 Bedroom Royal Pool Villa'},
+    {id:'h177',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'4 Bedroom Presidential Pool Villa'},
+    {id:'h178',region:'스미냑·짱구',name:'PEPPERS SEMINYAK',sub:'5 Bedroom Presidential Pool Villa'},
+    {id:'h179',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Corner Suite Garden View'},
+    {id:'h180',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Corner Suite Lagoon Access'},
+    {id:'h181',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Corner Suite Ocean View'},
+    {id:'h182',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Suite'},
+    {id:'h183',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Suite Lagoon Access'},
+    {id:'h184',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Suite Ocean View'},
+    {id:'h185',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Villa Beachfront Private Pool'},
+    {id:'h186',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'One Bedroom Villa Garden View Private Pool'},
+    {id:'h187',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Studio Suite'},
+    {id:'h188',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Studio Suite Lagoon Access'},
+    {id:'h189',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Studio Suite Ocean View'},
+    {id:'h190',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Two Bedroom Penthouse Oceanfront Private Pool'},
+    {id:'h191',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Two Bedroom Suite'},
+    {id:'h192',region:'스미냑·짱구',name:'REGENT CANGGU',sub:'Two Bedroom Suite Lagoon Access'},
+    {id:'h193',region:'스미냑·짱구',name:'Royal Samaja Villas',sub:'One Bedroom Pool Villa'},
+    {id:'h194',region:'스미냑·짱구',name:'Royal Tulip',sub:'Breakfast Adult'},
+    {id:'h195',region:'스미냑·짱구',name:'Royal Tulip',sub:'Deluxe Garden View'},
+    {id:'h196',region:'스미냑·짱구',name:'Royal Tulip',sub:'Deluxe Pool View'},
+    {id:'h197',region:'스미냑·짱구',name:'Royal Tulip',sub:'Family Suite Garden View'},
+    {id:'h198',region:'스미냑·짱구',name:'SOLIA',sub:'Solia Deluxe'},
+    {id:'h199',region:'스미냑·짱구',name:'SOLIA',sub:'Solia Premier'},
+    {id:'h200',region:'스미냑·짱구',name:'SOLIA',sub:'Solia Suite'},
+    {id:'h201',region:'스미냑·짱구',name:'Samaja Beachside Villas',sub:'One Bedroom Pool Villa'},
+    {id:'h202',region:'스미냑·짱구',name:'Samaja Villas Kunti',sub:'One Bedroom Pool Villa'},
+    {id:'h203',region:'스미냑·짱구',name:'THE ANNA CANGGU',sub:'Aine One Bedroom Pool Villa'},
+    {id:'h204',region:'스미냑·짱구',name:'THE ANNA CANGGU',sub:'Hikari/Kirana One Bedroom Pool Villa'},
+    {id:'h205',region:'스미냑·짱구',name:'THE TRANS',sub:'Celebrity Suite'},
+    {id:'h206',region:'스미냑·짱구',name:'THE TRANS',sub:'Premier Club'},
+    {id:'h207',region:'스미냑·짱구',name:'THE TRANS',sub:'Premier Room'},
+    {id:'h208',region:'스미냑·짱구',name:'THE TRANS',sub:'Ultimate Premier'},
+    {id:'h209',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort Balcony'},
+    {id:'h210',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort Balcony Dbl Bed'},
+    {id:'h211',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort Balcony Twn Bed'},
+    {id:'h212',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort XL Balcony'},
+    {id:'h213',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort XL Balcony Dbl Bed'},
+    {id:'h214',region:'스미냑·짱구',name:'TRIBE',sub:'Tribe Comfort XL Balcony Twn Bed'},
+    {id:'h215',region:'스미냑·짱구',name:'TUGU CANGGU',sub:'Dedari Suites'},
+    {id:'h216',region:'스미냑·짱구',name:'TUGU CANGGU',sub:'Puri Le Mayeur'},
+    {id:'h217',region:'스미냑·짱구',name:'TUGU CANGGU',sub:'Rejang Suites'},
+    {id:'h218',region:'스미냑·짱구',name:'TUGU CANGGU',sub:'Walter Spies Pavilion'},
+    {id:'h219',region:'스미냑·짱구',name:'W BALI',sub:'Marvelous One Bedroom Pool Villa'},
+    {id:'h220',region:'스미냑·짱구',name:'W BALI',sub:'Spectacular Ocean Facing Escape'},
+    {id:'h221',region:'스미냑·짱구',name:'W BALI',sub:'Wonderful Garden View Escape'},
+    {id:'h222',region:'스미냑·짱구',name:'W BALI',sub:'Wow Two Bedroom Pool Villa'},
+    {id:'h223',region:'우붓',name:'ADIWANA BISMA',sub:'Adiwana Rice Field Room'},
+    {id:'h224',region:'우붓',name:'ADIWANA BISMA',sub:'Bisma Jungle Room'},
+    {id:'h225',region:'우붓',name:'ADIWANA BISMA',sub:'Bisma Room'},
+    {id:'h226',region:'우붓',name:'ADIWANA BISMA',sub:'Grand Deluxe'},
+    {id:'h227',region:'우붓',name:'ADIWANA UNAGI',sub:'Adiwana Forest View'},
+    {id:'h228',region:'우붓',name:'ADIWANA UNAGI',sub:'Adiwana Pool Access'},
+    {id:'h229',region:'우붓',name:'ADIWANA UNAGI',sub:'Club Room'},
+    {id:'h230',region:'우붓',name:'ADIWANA UNAGI',sub:'One Bedroom Pool Villa'},
+    {id:'h231',region:'우붓',name:'ADIWANA UNAGI',sub:'Unagi Suites'},
+    {id:'h232',region:'우붓',name:'ANATHERA RESORT',sub:'Deluxe Pool View'},
+    {id:'h233',region:'우붓',name:'ANATHERA RESORT',sub:'Deluxe Room - No Balcony'},
+    {id:'h234',region:'우붓',name:'ANATHERA RESORT',sub:'Deluxe Room Balcony'},
+    {id:'h235',region:'우붓',name:'ANATHERA RESORT',sub:'Family Pool View'},
+    {id:'h236',region:'우붓',name:'ANATHERA RESORT',sub:'Grand Deluxe Pool View'},
+    {id:'h237',region:'우붓',name:'ANATHERA RESORT',sub:'Premier Pool View'},
+    {id:'h238',region:'우붓',name:'ANATHERA RESORT',sub:'Premier Room'},
+    {id:'h239',region:'우붓',name:'ANATHERA RESORT',sub:'Triple Room'},
+    {id:'h240',region:'우붓',name:'ELEMENT by Westin Ubud',sub:'Deluxe Room'},
+    {id:'h241',region:'우붓',name:'IMPIANA',sub:'Breakfast Adult'},
+    {id:'h242',region:'우붓',name:'IMPIANA',sub:'Deluxe One Bedroom Villa'},
+    {id:'h243',region:'우붓',name:'IMPIANA',sub:'One Bedroom Villa'},
+    {id:'h244',region:'우붓',name:'IMPIANA',sub:'Three Bedroom Villa'},
+    {id:'h245',region:'우붓',name:'IMPIANA',sub:'Two Bedroom Villa'},
+    {id:'h246',region:'우붓',name:'KAMANDALU',sub:'Garden Pool Villa'},
+    {id:'h247',region:'우붓',name:'KAMANDALU',sub:'Garden Villa'},
+    {id:'h248',region:'우붓',name:'KAMANDALU',sub:'Graden Villa'},
+    {id:'h249',region:'우붓',name:'KAMANDALU',sub:'Two Bedroom Garden Pool Villa'},
+    {id:'h250',region:'우붓',name:'KAMANDALU',sub:'Two Bedroom Valley Pool Villa'},
+    {id:'h251',region:'우붓',name:'KAMANDALU',sub:'Valley Pool Villa'},
+    {id:'h252',region:'우붓',name:'KAYON GROUP',sub:'Jungle View Pool Villa'},
+    {id:'h253',region:'우붓',name:'KAYON GROUP',sub:'Premier Pool Villa'},
+    {id:'h254',region:'우붓',name:'KAYON GROUP',sub:'Premier Pool Villa with Spa Batch'},
+    {id:'h255',region:'우붓',name:'KAYON GROUP',sub:'Valley Pool Villa'},
+    {id:'h256',region:'우붓',name:'KAYON JUNGLE RESORT',sub:'Jungle Pool Villa'},
+    {id:'h257',region:'우붓',name:'KAYON JUNGLE RESORT',sub:'Kayon Jungle Suite'},
+    {id:'h258',region:'우붓',name:'KAYON JUNGLE RESORT',sub:'Kayon Premier Pool Villa'},
+    {id:'h259',region:'우붓',name:'KAYON JUNGLE RESORT',sub:'Kayon Royal Pool Villa'},
+    {id:'h260',region:'우붓',name:'KAYON JUNGLE RESORT',sub:'Valley Pool Villa'},
+    {id:'h261',region:'우붓',name:'KAYON VALLEY RESORT',sub:'Kayon Jungle Pool Villa'},
+    {id:'h262',region:'우붓',name:'KAYON VALLEY RESORT',sub:'Kayon Valley Pool Villa'},
+    {id:'h263',region:'우붓',name:'KAYON VALLEY RESORT',sub:'Premier Pool Villa'},
+    {id:'h264',region:'우붓',name:'KAYON VALLEY RESORT',sub:'Premier Pool Villa with Spa Batch'},
+    {id:'h265',region:'우붓',name:'KOMANEKA AT BISMA',sub:'3BR Bisma Residence'},
+    {id:'h266',region:'우붓',name:'KOMANEKA AT BISMA',sub:'Bisma Suite Room'},
+    {id:'h267',region:'우붓',name:'KOMANEKA AT BISMA',sub:'Family Pool Villa'},
+    {id:'h268',region:'우붓',name:'KOMANEKA AT BISMA',sub:'Family Suite Room'},
+    {id:'h269',region:'우붓',name:'KOMANEKA AT BISMA',sub:'One Bedroom Pool Villa'},
+    {id:'h270',region:'우붓',name:'KOMANEKA AT BISMA',sub:'Two Bedroom Pool Villa'},
+    {id:'h271',region:'우붓',name:'KOMANEKA AT MONKEY FOREST',sub:'Pool Villa'},
+    {id:'h272',region:'우붓',name:'KOMANEKA AT MONKEY FOREST',sub:'Suite Room'},
+    {id:'h273',region:'우붓',name:'KOMANEKA AT RASA SAYANG',sub:'2-Bedroom Rooftop Garden Villa'},
+    {id:'h274',region:'우붓',name:'KOMANEKA AT RASA SAYANG',sub:'Deluxe Room'},
+    {id:'h275',region:'우붓',name:'KOMANEKA AT RASA SAYANG',sub:'Rooftop Garden Villa'},
+    {id:'h276',region:'우붓',name:'KOMANEKA AT TANGGAYUDA',sub:'Bale Daja - 2BR Pool Villa'},
+    {id:'h277',region:'우붓',name:'KOMANEKA AT TANGGAYUDA',sub:'Courtyard Pool Villa'},
+    {id:'h278',region:'우붓',name:'KOMANEKA AT TANGGAYUDA',sub:'Garden Villa'},
+    {id:'h279',region:'우붓',name:'KOMANEKA AT TANGGAYUDA',sub:'Premiere Valley Pool Villa'},
+    {id:'h280',region:'우붓',name:'KOMANEKA AT TANGGAYUDA',sub:'Valley Pool Villa'},
+    {id:'h281',region:'우붓',name:'LUMBINI VILLA',sub:'2N PKG'},
+    {id:'h282',region:'우붓',name:'LUMBINI VILLA',sub:'3N PKG'},
+    {id:'h283',region:'우붓',name:'LUMBINI VILLA',sub:'4N PKG'},
+    {id:'h284',region:'우붓',name:'LUMBINI VILLA',sub:'Five Bedroom Suite Villa'},
+    {id:'h285',region:'우붓',name:'LUMBINI VILLA',sub:'Four Bedroom Suite Villa'},
+    {id:'h286',region:'우붓',name:'LUMBINI VILLA',sub:'One Bedroom Deluxe Villa'},
+    {id:'h287',region:'우붓',name:'LUMBINI VILLA',sub:'One Bedroom Suite Villa'},
+    {id:'h288',region:'우붓',name:'LUMBINI VILLA',sub:'Three Bedroom Suite Villa'},
+    {id:'h289',region:'우붓',name:'LUMBINI VILLA',sub:'Two Bedroom Deluxe Villa'},
+    {id:'h290',region:'우붓',name:'LUMBINI VILLA',sub:'Two Bedroom Suite Villa'},
+    {id:'h291',region:'우붓',name:'MANDAPA RITZ CARLTON',sub:'1 Bedroom River Front Pool Villa'},
+    {id:'h292',region:'우붓',name:'MANDAPA RITZ CARLTON',sub:'1 Bedroom Ubud Pool Villa'},
+    {id:'h293',region:'우붓',name:'MANDAPA RITZ CARLTON',sub:'Mandapa Suite'},
+    {id:'h294',region:'우붓',name:'MANDAPA RITZ CARLTON',sub:'Reserve Suite'},
+    {id:'h295',region:'우붓',name:'MAYA GROUP',sub:'Heavenly Jacuzzi Villa'},
+    {id:'h296',region:'우붓',name:'MAYA GROUP',sub:'Heavenly Ocean View Pool Suite'},
+    {id:'h297',region:'우붓',name:'MAYA GROUP',sub:'Heavenly Pool Suite'},
+    {id:'h298',region:'우붓',name:'MAYA GROUP',sub:'Heavenly Pool Villa'},
+    {id:'h299',region:'우붓',name:'MAYA GROUP',sub:'Impressive Forest Corner Suite'},
+    {id:'h300',region:'우붓',name:'MAYA GROUP',sub:'Impressive Forest Suite'},
+    {id:'h301',region:'우붓',name:'MAYA GROUP',sub:'Impressive Lagoon Pool Suite'},
+    {id:'h302',region:'우붓',name:'MAYA GROUP',sub:'Impressive Nest Suite'},
+    {id:'h303',region:'우붓',name:'MAYA GROUP',sub:'Sofa Bed set up'},
+    {id:'h304',region:'우붓',name:'MAYA GROUP',sub:'Wonderful Garden View'},
+    {id:'h305',region:'우붓',name:'PADMA UBUD',sub:'Family Suite'},
+    {id:'h306',region:'우붓',name:'PADMA UBUD',sub:'One Bedroom Suite'},
+    {id:'h307',region:'우붓',name:'PADMA UBUD',sub:'Premier Club Room'},
+    {id:'h308',region:'우붓',name:'PADMA UBUD',sub:'Premier Deluxe Room'},
+    {id:'h309',region:'우붓',name:'PADMA UBUD',sub:'Premier Oversized Twn'},
+    {id:'h310',region:'우붓',name:'PADMA UBUD',sub:'Premier Room'},
+    {id:'h311',region:'우붓',name:'PADMA UBUD',sub:'Two bedroom Suite'},
+    {id:'h312',region:'우붓',name:'SAMSARA UBUD',sub:'2N PACKAGE RATE'},
+    {id:'h313',region:'우붓',name:'SAMSARA UBUD',sub:'3N PACKAGE RATE'},
+    {id:'h314',region:'우붓',name:'SAMSARA UBUD',sub:'One Bedroom Deluxe Pool Villa'},
+    {id:'h315',region:'우붓',name:'SAMSARA UBUD',sub:'One Bedroom Pool Villa'},
+    {id:'h316',region:'우붓',name:'SAMSARA UBUD',sub:'Three Bedroom Pool Villa'},
+    {id:'h317',region:'우붓',name:'SAMSARA UBUD',sub:'Two Bedroom Pool Villa'},
+    {id:'h318',region:'우붓',name:'SENS HOTEL UBUD',sub:'Premium'},
+    {id:'h319',region:'우붓',name:'SENS HOTEL UBUD',sub:'Superior'},
+    {id:'h320',region:'우붓',name:'SENS HOTEL UBUD',sub:'Superior Plus'},
+    {id:'h321',region:'우붓',name:'SERES',sub:'Ananda Lower One Bedroom Pool Villa'},
+    {id:'h322',region:'우붓',name:'SERES',sub:'Ananda Upper One Bedroom Pool Villa'},
+    {id:'h323',region:'우붓',name:'SERES',sub:'Deluxe'},
+    {id:'h324',region:'우붓',name:'SERES',sub:'Deluxe Pool Access'},
+    {id:'h325',region:'우붓',name:'SERES',sub:'Premium'},
+    {id:'h326',region:'우붓',name:'SERES',sub:'Premium Pool Access'},
+    {id:'h327',region:'우붓',name:'SERES',sub:'Sutera One Bedroom Pool Villa'},
+    {id:'h328',region:'우붓',name:'STHALA UBUD',sub:'Deluxe room with balcony'},
+    {id:'h329',region:'우붓',name:'STHALA UBUD',sub:'Rollaway Beds'},
+    {id:'h330',region:'우붓',name:'THE LIGHT VILLA, THE BIDADARI VILLA & THE YUBI BOUTIQUE VILLAS',sub:'The Bidadari Villas & Spa'},
+    {id:'h331',region:'우붓',name:'THE LIGHT VILLA, THE BIDADARI VILLA & THE YUBI BOUTIQUE VILLAS',sub:'The Light Exclusive Villas & Spa'},
+    {id:'h332',region:'우붓',name:'THE LIGHT VILLA, THE BIDADARI VILLA & THE YUBI BOUTIQUE VILLAS',sub:'The Yubi Boutique Villas'},
+    {id:'h333',region:'우붓',name:'WESTIN UBUD',sub:'Deluxe Garden View'},
+    {id:'h334',region:'우붓',name:'WESTIN UBUD',sub:'Deluxe Pool view'},
+    {id:'h335',region:'우붓',name:'WESTIN UBUD',sub:'Executive Suite'},
+    {id:'h336',region:'우붓',name:'WESTIN UBUD',sub:'Junior suite'},
+    {id:'h337',region:'우붓',name:'WESTIN UBUD',sub:'Rollaway Beds'},
+    {id:'h338',region:'짐바란·울루와뚜',name:'AYANA',sub:'1BR Ocean Front Villa'},
+    {id:'h339',region:'짐바란·울루와뚜',name:'AYANA',sub:'1BR Ocean View Residance'},
+    {id:'h340',region:'짐바란·울루와뚜',name:'AYANA',sub:'1BR Ocean View Villa'},
+    {id:'h341',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean Front Villa'},
+    {id:'h342',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean View Residance'},
+    {id:'h343',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean View Residance with Pool'},
+    {id:'h344',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean View Room'},
+    {id:'h345',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean View Suite'},
+    {id:'h346',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Ocean View Villa'},
+    {id:'h347',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Resort View Room'},
+    {id:'h348',region:'짐바란·울루와뚜',name:'AYANA',sub:'2BR Resort View Suite'},
+    {id:'h349',region:'짐바란·울루와뚜',name:'AYANA',sub:'4-11 YO ABF - Sharing bed'},
+    {id:'h350',region:'짐바란·울루와뚜',name:'AYANA',sub:'Deluxe Ocean View Room'},
+    {id:'h351',region:'짐바란·울루와뚜',name:'AYANA',sub:'Jimbaran Bay Room'},
+    {id:'h352',region:'짐바란·울루와뚜',name:'AYANA',sub:'Ocean View Room'},
+    {id:'h353',region:'짐바란·울루와뚜',name:'AYANA',sub:'Ocean View Suite'},
+    {id:'h354',region:'짐바란·울루와뚜',name:'AYANA',sub:'Pool Access Room'},
+    {id:'h355',region:'짐바란·울루와뚜',name:'AYANA',sub:'Pool Access Suite'},
+    {id:'h356',region:'짐바란·울루와뚜',name:'AYANA',sub:'Resort View Room'},
+    {id:'h357',region:'짐바란·울루와뚜',name:'AYANA',sub:'Resort View Suite'},
+    {id:'h358',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana 2BR Ocean View Room'},
+    {id:'h359',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana 2BR Resort View Room'},
+    {id:'h360',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana Garden View Room'},
+    {id:'h361',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana Ocean View Room'},
+    {id:'h362',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana Pool Access Room'},
+    {id:'h363',region:'짐바란·울루와뚜',name:'AYANA',sub:'Wana Resort View Room'},
+    {id:'h364',region:'짐바란·울루와뚜',name:'FAIRFIELD South Kuta by Marriott',sub:'Superior non Balcony'},
+    {id:'h365',region:'짐바란·울루와뚜',name:'FAIRFIELD South Kuta by Marriott',sub:'Superior with Balcony'},
+    {id:'h366',region:'짐바란·울루와뚜',name:'HILIWATU',sub:'Four Bedroom Villa'},
+    {id:'h367',region:'짐바란·울루와뚜',name:'HILIWATU',sub:'One Bedroom Suite'},
+    {id:'h368',region:'짐바란·울루와뚜',name:'HILIWATU',sub:'One Bedroom Villa'},
+    {id:'h369',region:'짐바란·울루와뚜',name:'HILIWATU',sub:'Three Bedroom Villa'},
+    {id:'h370',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'2 Bedroom Classica Villa'},
+    {id:'h371',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'2 Bedroom Jivana Villa'},
+    {id:'h372',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Balinese Suite'},
+    {id:'h373',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Bukit Suite'},
+    {id:'h374',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Classic Garden View'},
+    {id:'h375',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Classice Singaraja Lounge Access Garden View'},
+    {id:'h376',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Pecatu Suite'},
+    {id:'h377',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Premium Club Lounge Graden View'},
+    {id:'h378',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Premium Clun Lounge Access Garden View'},
+    {id:'h379',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Premium Living Area Club Lounge Access (Duplex)'},
+    {id:'h380',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Premium Living Area Singaraja Lounge Access (Duplex)'},
+    {id:'h381',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Sanctuary Suite'},
+    {id:'h382',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Suite Dining Club Lounge Access'},
+    {id:'h383',region:'짐바란·울루와뚜',name:'INTERCONTINENTAL',sub:'Uluwatu Suite'},
+    {id:'h384',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Aqua Pool Sky Penthouse'},
+    {id:'h385',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Aqua Studio Suite Lagoon Access'},
+    {id:'h386',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Aqua Studio Suite Lagoon View'},
+    {id:'h387',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Avant Garde 1 Bedroom Suite'},
+    {id:'h388',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Avant Garde 2 Bedroom Suite'},
+    {id:'h389',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Classic'},
+    {id:'h390',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Deluxe Lagoon Access'},
+    {id:'h391',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Lagoon Access Room'},
+    {id:'h392',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Lagoon View Room'},
+    {id:'h393',region:'짐바란·울루와뚜',name:'LE MERIDIEN',sub:'Oceanic View Sky Villa'},
+    {id:'h394',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Classic Pool View'},
+    {id:'h395',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Classic Room'},
+    {id:'h396',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Family Duplex Pool View Room'},
+    {id:'h397',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Family Duplex Room'},
+    {id:'h398',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Jimbaran Pool Suite'},
+    {id:'h399',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Junior Suite'},
+    {id:'h400',region:'짐바란·울루와뚜',name:'MOVENPICK',sub:'Premium Suite'},
+    {id:'h401',region:'짐바란·울루와뚜',name:'PULLMAN BALI',sub:'Deluxe Executive'},
+    {id:'h402',region:'짐바란·울루와뚜',name:'PULLMAN BALI',sub:'Deluxe Room'},
+    {id:'h403',region:'짐바란·울루와뚜',name:'PULLMAN BALI',sub:'Premium Deluxe Garden View'},
+    {id:'h404',region:'짐바란·울루와뚜',name:'PULLMAN BALI',sub:'Premium Deluxe Ocean View'},
+    {id:'h405',region:'짐바란·울루와뚜',name:'PULLMAN BALI',sub:'Superior Suite'},
+    {id:'h406',region:'짐바란·울루와뚜',name:'RENAISSANCE ULUWATU',sub:'Deluxe Ocean Balcony'},
+    {id:'h407',region:'짐바란·울루와뚜',name:'RENAISSANCE ULUWATU',sub:'Deluxe Ocean Terrace'},
+    {id:'h408',region:'짐바란·울루와뚜',name:'RENAISSANCE ULUWATU',sub:'Deluxe Room'},
+    {id:'h409',region:'짐바란·울루와뚜',name:'RENAISSANCE ULUWATU',sub:'Executive Suite'},
+    {id:'h410',region:'짐바란·울루와뚜',name:'RENAISSANCE ULUWATU',sub:'Junior Suite'},
+    {id:'h411',region:'사누르',name:'BALI BEACH HOTEL',sub:'Bali Beach Suite Ocean'},
+    {id:'h412',region:'사누르',name:'BALI BEACH HOTEL',sub:'Deluxe Ocean'},
+    {id:'h413',region:'사누르',name:'BALI BEACH HOTEL',sub:'Executive Ocean'},
+    {id:'h414',region:'사누르',name:'BALI BEACH HOTEL',sub:'Executive Suite Ocean'},
+    {id:'h415',region:'사누르',name:'BALI BEACH HOTEL',sub:'Presidential Suite Ocean'},
+    {id:'h416',region:'사누르',name:'BALI BEACH HOTEL',sub:'Royal Suite Ocean'},
+    {id:'h417',region:'사누르',name:'BALI BEACH HOTEL',sub:'Sanur Suite Ocean'},
+    {id:'h418',region:'사누르',name:'PRAMA SANUR',sub:'Club Room'},
+    {id:'h419',region:'사누르',name:'PRAMA SANUR',sub:'Deluxe Garden View'},
+    {id:'h420',region:'사누르',name:'PRAMA SANUR',sub:'Deluxe Sea View'},
+    {id:'h421',region:'사누르',name:'PRAMA SANUR',sub:'Junior Suite'},
+    {id:'h422',region:'사누르',name:'PRAMA SANUR',sub:'Superior Room'},
+    {id:'h423',region:'사누르',name:'THE MERU SANUR',sub:'Corber Tropical Suite'},
+    {id:'h424',region:'사누르',name:'THE MERU SANUR',sub:'Meru Suite Ocean'},
+    {id:'h425',region:'사누르',name:'THE MERU SANUR',sub:'Premier Tropical Suite'},
+    {id:'h426',region:'사누르',name:'THE MERU SANUR',sub:'Presidential Suite Ocean'},
+    {id:'h427',region:'사누르',name:'THE MERU SANUR',sub:'Tropical Garden Suite'},
+    {id:'h428',region:'사누르',name:'THE MERU SANUR',sub:'Tropical Suite'},
+    {id:'h429',region:'기타(로비나 등)',name:'ANEKA LOVINA',sub:'Cottage'},
+    {id:'h430',region:'기타(로비나 등)',name:'ANEKA LOVINA',sub:'Superior Building'},
+    {id:'h431',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'1 Bedroom Suite Villas'},
+    {id:'h432',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'1-Bedroom Luxury Villas'},
+    {id:'h433',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'2BR Villa'},
+    {id:'h434',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'3BR Villa'},
+    {id:'h435',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'3BR Villa New'},
+    {id:'h436',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'6BR Villa'},
+    {id:'h437',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Anagata Suite'},
+    {id:'h438',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Deluxe'},
+    {id:'h439',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Deluxe Balcony'},
+    {id:'h440',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Deluxe Room'},
+    {id:'h441',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Executive'},
+    {id:'h442',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Executive Suite'},
+    {id:'h443',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Family Room'},
+    {id:'h444',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Family Suite'},
+    {id:'h445',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Grand Deluxe'},
+    {id:'h446',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Junior Suite'},
+    {id:'h447',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'OBR Villa'},
+    {id:'h448',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Premium Room'},
+    {id:'h449',region:'기타(누사페니다 등)',name:'MAUA Villa - Nusa Penida 5*',sub:'Suite'},
+    {id:'h999',region:'기타',name:'기타 호텔 (직접입력)',sub:'1박 1실 단가(USD) 직접 입력',custom:true},
   ],
 
 
@@ -971,6 +1383,8 @@ function buildPanel(){
   renderSelectedOptions('adm');
   renderSelectedOptions('tour');
   renderSelectedOptions('spa');
+  updateHotelSelectedDisplay('1');
+  updateHotelSelectedDisplay('2');
 }
 
 /* 박수 변경 시 차량/가이드 이용일수 + 호텔 박수 기본값 동기화 */
@@ -990,78 +1404,107 @@ function buildHotelSectionHtml(){
   // 권역별 optgroup 구성
   const regions = [];
   CATALOG.hotels.forEach(h=>{ if(!regions.includes(h.region)) regions.push(h.region); });
+  function escAttr(s){ return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
   function optionsHtml(){
     return regions.map(r=>{
       const opts = CATALOG.hotels.filter(h=>h.region===r).map(h=>{
         const label = h.custom ? h.name : `${h.name} (${h.sub})`;
-        return `<option value="${h.id}">${label}</option>`;
+        const searchKey = escAttr(`${h.name} ${h.sub||''} ${h.region}`.toLowerCase());
+        return `<option value="${h.id}" data-search="${searchKey}">${label}</option>`;
       }).join('');
       return `<optgroup label="${r}">${opts}</optgroup>`;
     }).join('');
   }
+  function hotelBlock(n, title){
+    return `
+      <div>
+        <div class="hotel-section-label">${title}</div>
+        <div class="subsection-title">✅ 선택된 호텔</div>
+        <div id="hotel${n}-selected"></div>
+        <div class="form-row" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <label class="form-label">호텔 검색</label>
+            <input type="text" id="hotel${n}-search" class="form-control" placeholder="🔍 호텔명·지역으로 검색 (예: 누사두아, Aloft)" oninput="filterHotelOptions('${n}')">
+          </div>
+        </div>
+        <div class="form-row" style="grid-template-columns:1fr">
+          <div class="form-group">
+            <label class="form-label">호텔 선택 (총 ${CATALOG.hotels.length}개)</label>
+            <select id="hotel${n}-select" class="form-control" onchange="onHotelChange('${n}')">${optionsHtml()}</select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">박수</label>
+            <input type="number" id="hotel${n}-nights" class="form-control" value="${n==='1'?4:0}" min="0" step="1" oninput="calc()">
+          </div>
+          <div class="form-group">
+            <label class="form-label">시즌</label>
+            <select id="hotel${n}-season" class="form-control" onchange="calc()">
+              <option value="low">비수기</option>
+              <option value="high">성수기 (7-8월·12/25-1/1)</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row" id="hotel${n}-custom-row" style="display:none">
+          <div class="form-group" style="grid-column:1/-1">
+            <label class="form-label">기타호텔 1박 단가 (USD)</label>
+            <input type="number" id="hotel${n}-custom" class="form-control" value="0" min="0" step="1" oninput="calc()">
+          </div>
+        </div>
+        <div id="hotel${n}-info" class="vehicle-info"></div>
+      </div>`;
+  }
   return `
     <div class="dual-hotel">
-      <div>
-        <div class="hotel-section-label">숙박 1 (필수)</div>
-        <div class="form-row" style="grid-template-columns:1fr">
-          <div class="form-group">
-            <label class="form-label">호텔 선택</label>
-            <select id="hotel1-select" class="form-control" onchange="calc()">${optionsHtml()}</select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">박수</label>
-            <input type="number" id="hotel1-nights" class="form-control" value="4" min="0" step="1" oninput="calc()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">시즌</label>
-            <select id="hotel1-season" class="form-control" onchange="calc()">
-              <option value="low">비수기</option>
-              <option value="high">성수기 (7-8월·12/25-1/1)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row" id="hotel1-custom-row" style="display:none">
-          <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">기타호텔 1박 단가 (USD)</label>
-            <input type="number" id="hotel1-custom" class="form-control" value="0" min="0" step="1" oninput="calc()">
-          </div>
-        </div>
-        <div id="hotel1-info" class="vehicle-info"></div>
-      </div>
-      <div>
-        <div class="hotel-section-label">숙박 2 (선택, 박수 0이면 미적용)</div>
-        <div class="form-row" style="grid-template-columns:1fr">
-          <div class="form-group">
-            <label class="form-label">호텔 선택</label>
-            <select id="hotel2-select" class="form-control" onchange="calc()">${optionsHtml()}</select>
-          </div>
-        </div>
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">박수</label>
-            <input type="number" id="hotel2-nights" class="form-control" value="0" min="0" step="1" oninput="calc()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">시즌</label>
-            <select id="hotel2-season" class="form-control" onchange="calc()">
-              <option value="low">비수기</option>
-              <option value="high">성수기 (7-8월·12/25-1/1)</option>
-            </select>
-          </div>
-        </div>
-        <div class="form-row" id="hotel2-custom-row" style="display:none">
-          <div class="form-group" style="grid-column:1/-1">
-            <label class="form-label">기타호텔 1박 단가 (USD)</label>
-            <input type="number" id="hotel2-custom" class="form-control" value="0" min="0" step="1" oninput="calc()">
-          </div>
-        </div>
-        <div id="hotel2-info" class="vehicle-info"></div>
-      </div>
+      ${hotelBlock('1','숙박 1 (필수)')}
+      ${hotelBlock('2','숙박 2 (선택, 박수 0이면 미적용)')}
     </div>
   `;
 }
+
+/* 호텔 검색창 입력 시 select의 option/optgroup을 필터링 */
+window.filterHotelOptions = function(n){
+  const input  = document.getElementById('hotel'+n+'-search');
+  const select = document.getElementById('hotel'+n+'-select');
+  if(!input || !select) return;
+  const q = input.value.trim().toLowerCase();
+  Array.from(select.querySelectorAll('optgroup')).forEach(og=>{
+    let anyVisible = false;
+    Array.from(og.children).forEach(opt=>{
+      const match = !q || (opt.dataset.search||'').includes(q);
+      opt.hidden = !match;
+      if(match) anyVisible = true;
+    });
+    og.hidden = !anyVisible;
+  });
+};
+
+/* 호텔 select 변경 시: 상단 "선택된 호텔" 표시 갱신 + 재계산 */
+window.onHotelChange = function(n){
+  updateHotelSelectedDisplay(n);
+  calc();
+};
+
+/* "선택된 호텔" 상단 요약 표시 (식사/옵션 선택 요약과 동일한 스타일) */
+window.updateHotelSelectedDisplay = function(n){
+  const sel  = document.getElementById('hotel'+n+'-select');
+  const wrap = document.getElementById('hotel'+n+'-selected');
+  if(!sel || !wrap) return;
+  const hotel = CATALOG.hotels.find(h=>h.id===sel.value);
+  if(!hotel){
+    wrap.innerHTML = `<div class="meal-selected-empty">선택된 호텔이 없습니다.</div>`;
+    return;
+  }
+  const label = hotel.custom ? hotel.name : `${hotel.name} (${hotel.sub})`;
+  wrap.innerHTML = `
+    <div class="meal-row selected">
+      <div style="flex:1">
+        <span class="meal-name">${label}</span>
+        <span class="option-note"> · ${hotel.region}</span>
+      </div>
+    </div>`;
+};
 
 /* ════════════════════════════════════════════════════════════
    식사 섹션 HTML (그룹별 접이식 + 수량 카운터)
@@ -1703,4 +2146,4 @@ calc();
 refreshExchangeRate();
 })();
 </script>
-<!-- /* ════════════════════════�
+<!-- /* ════════════════════════�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
