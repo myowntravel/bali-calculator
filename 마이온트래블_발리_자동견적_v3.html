@@ -54,17 +54,15 @@
 .mobile-bar-price{font-size:22px;font-weight:900;letter-spacing:-1px}
 .mobile-bar-btn{background:#facc15;color:#0f5132;border:none;border-radius:8px;padding:8px 14px;font-weight:800;font-size:13px;cursor:pointer;font-family:inherit;white-space:nowrap;flex-shrink:0}
 @media(max-width:768px){.mobile-bar{display:flex!important}}
-/* ── 시트 오버레이 ── */
-.sheet-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:590}
-.sheet-overlay.open{display:block}
-/* ── result-panel 시트 모드 (모바일에서 열릴 때) ── */
+/* ── 시트 오버레이 (더이상 사용하지 않음 - 인라인 아코디언 방식으로 대체) ── */
+.sheet-overlay{display:none}
+/* ── result-panel 모바일 아코디언 모드: 하단 배너 바로 위에서 펼쳐짐 ── */
 @media(max-width:768px){
   .result-panel.sheet-open{
-    display:block!important;position:fixed!important;
-    bottom:0;left:0;right:0;max-height:88vh;overflow-y:auto;
-    border-radius:16px 16px 0 0;z-index:600;
-    box-shadow:0 -4px 30px rgba(0,0,0,.3);margin:0;
-    padding-bottom:env(safe-area-inset-bottom,0px);
+    display:block!important;position:static;
+    margin:10px 0 90px;border-radius:16px;
+    box-shadow:0 2px 16px rgba(0,0,0,.12);
+    max-height:none;overflow:visible;
   }
 }
 /* ── 시트 드래그 핸들 (모바일 전용) ── */
@@ -2074,21 +2072,33 @@ window.saveAsImage = async function(){
    모바일 결과 시트 열기/닫기
    ════════════════════════════════════════════════════════════ */
 window.openSheet = function(){
-  document.querySelector('.result-panel').classList.add('sheet-open');
-  document.getElementById('sheet-overlay').classList.add('open');
-  /* 시트가 화면에 보이도록 부모 페이지에 스크롤 위치 전달
-     (iframe이 자체 스크롤 없이 전체 높이로 렌더링되므로,
-      시트의 iframe 내부 좌표를 부모가 받아 페이지 스크롤을 옮겨줘야 함) */
+  const panel = document.querySelector('.result-panel');
+  const bar = document.getElementById('mobile-bar');
+  if(!panel || !bar) return;
+  /* 패널의 원래 위치를 기억하기 위한 placeholder (최초 1회만 생성) */
+  if(!document.getElementById('result-panel-placeholder')){
+    const ph = document.createElement('div');
+    ph.id = 'result-panel-placeholder';
+    ph.style.display = 'none';
+    panel.parentNode.insertBefore(ph, panel);
+  }
+  /* 하단 배너(mobile-bar) 바로 위로 패널을 이동 → "배너에서 위로 펼쳐짐" */
+  bar.parentNode.insertBefore(panel, bar);
+  panel.classList.add('sheet-open');
+  /* 펼쳐진 패널이 화면에 보이도록 부모 페이지 스크롤 위치 전달
+     (인라인 배치이므로 패널의 iframe 내 좌표가 곧 실제 위치) */
   requestAnimationFrame(()=>{
-    const sheet = document.querySelector('.result-panel.sheet-open');
-    if(!sheet) return;
-    const rect = sheet.getBoundingClientRect();
-    try{ window.parent.postMessage({type:'mot-bali-scrollto', top: rect.top}, '*'); }catch(e){}
+    requestAnimationFrame(()=>{
+      const rect = panel.getBoundingClientRect();
+      try{ window.parent.postMessage({type:'mot-bali-scrollto', top: rect.top}, '*'); }catch(e){}
+    });
   });
 };
 window.closeSheet = function(){
-  document.querySelector('.result-panel').classList.remove('sheet-open');
-  document.getElementById('sheet-overlay').classList.remove('open');
+  const panel = document.querySelector('.result-panel');
+  const ph = document.getElementById('result-panel-placeholder');
+  panel.classList.remove('sheet-open');
+  if(ph) ph.parentNode.insertBefore(panel, ph);
 };
 
 /* ════════════════════════════════════════════════════════════
