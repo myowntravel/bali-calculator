@@ -1188,8 +1188,8 @@ const PACKAGES = [
       {day:6, title:'발리 → 인천', hotel:'-', items:['발리공항 출발 (KE434, 01:10)','인천공항 도착 (09:25)'], meals:{b:'기내식',l:'-',d:'-'}},
     ],
     preset:{
-      hotel1:{id:'h34', nights:2, season:'low'},
-      hotel2:{id:'h35', nights:2, season:'low'},
+      hotel1:{id:'h363', nights:2, season:'low'},
+      hotel2:{id:'h256', nights:2, season:'low'},
       meals:{m20:2, m26:2},
       admission:['a05','a01','a25','a35','a18','a28','a04'],
       tours:['t35','t69'],
@@ -1215,8 +1215,8 @@ const PACKAGES = [
       {day:7, title:'인천 도착', hotel:'-', items:['인천공항 도착 (07:45)'], meals:{b:'기내식',l:'-',d:'-'}},
     ],
     preset:{
-      hotel1:{id:'h34', nights:3, season:'low'},
-      hotel2:{id:'h36', nights:2, season:'low'},
+      hotel1:{id:'h363', nights:3, season:'low'},
+      hotel2:{id:'h078', nights:2, season:'low'},
       meals:{m20:2, m26:2, m73:2},
       admission:['a18','a28','a10','a04','a01','a25','a35'],
       tours:['t36','t70'],
@@ -1241,7 +1241,7 @@ const PACKAGES = [
       {day:6, title:'인천 도착', hotel:'-', items:['인천공항 도착'], meals:{b:'기내식',l:'-',d:'-'}},
     ],
     preset:{
-      hotel1:{id:'h34', nights:4, season:'low'},
+      hotel1:{id:'h363', nights:4, season:'low'},
       hotel2:{id:'', nights:0, season:'low'},
       meals:{m20:4, m25:4, m26:4},
       admission:['a05','a01','a25','a35','a18','a28','a10','a04'],
@@ -1883,8 +1883,14 @@ function applyPackagePreset(pkg){
     document.getElementById('hotel2-nights').value = h2.nights;
     document.getElementById('hotel2-season').value = h2.season;
   } else {
+    document.getElementById('hotel2-select').value = '';
     document.getElementById('hotel2-nights').value = 0;
   }
+
+  // 호텔 select에 프리셋 값을 채운 뒤 "선택된 호텔" 표시도 즉시 갱신
+  // (.value 직접 대입은 change 이벤트를 발생시키지 않으므로 수동 호출 필요)
+  updateHotelSelectedDisplay('1');
+  updateHotelSelectedDisplay('2');
 
   // 가이드
   const guideSel = document.getElementById('guide-select');
