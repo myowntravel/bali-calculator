@@ -324,7 +324,7 @@
   </div>
   <div class="package-grid" id="package-list"></div>
   <div class="pkg-view-footer">
-    <button class="btn btn-outline" onclick="showCalculator()">🧮 패키지 없이 직접 계산기 입력하기 →</button>
+    <button class="btn btn-outline" onclick="pkgDisplayDays=null;currentPkg=null;showCalculator()">🧮 패키지 없이 직접 계산기 입력하기 →</button>
   </div>
 </div>
 
@@ -1265,6 +1265,7 @@ const PACKAGES = [
    상태값 (state)
    ════════════════════════════════════════════════════════════ */
 let tripType = 'honeymoon';     // 'honeymoon' | 'family' → 마진 결정
+let pkgDisplayDays = null;       // 선택한 패키지 제목의 "n박m일" 중 m (표시용 총 일수, 야간 귀국편 등으로 nights+1과 다를 수 있음)
 let hotel1Id = '';
 let hotel2Id = '';
 let hotel1Custom = 0;            // 기타호텔 직접입력 단가(USD/박)
@@ -1755,8 +1756,9 @@ function renderResult(r){
   document.getElementById('r-grand-total').textContent = fmtKRW(r.grandFinal);
   document.getElementById('r-grand-sub').textContent =
     `= 1인당 ${fmtKRW(r.selling)} × ${persons}명 + 항공료 ${fmtKRW(r.airTotal)}`;
+  const displayDays = pkgDisplayDays && pkgDisplayDays > nights ? pkgDisplayDays : nights+1;
   document.getElementById('result-subtitle').textContent =
-    `${persons}명 · ${nights}박${nights+1}일 · ${tripType==='honeymoon' ? '허니문' : '가족/일반여행'}`;
+    `${persons}명 · ${nights}박${displayDays}일 · ${tripType==='honeymoon' ? '허니문' : '가족/일반여행'}`;
 
   /* 모바일 하단바 */
   document.getElementById('mb-label').textContent = `${persons}명 · 1인당 판매가 (지상비)`;
@@ -1771,6 +1773,12 @@ function renderResult(r){
    ════════════════════════════════════════════════════════════ */
 let currentPkg = null;
 
+/* 패키지 제목의 "n박m일" 중 m을 추출 (야간 귀국편 등으로 nights+1과 다를 수 있어 제목 기준으로 표시 통일) */
+function getPkgDisplayDays(pkg){
+  const m = pkg.title.match(/(\d+)박(\d+)일/);
+  return m ? parseInt(m[2], 10) : (pkg.nights + 1);
+}
+
 function renderPackages(){
   const wrap = document.getElementById('package-list');
   if(!wrap) return;
@@ -1782,7 +1790,7 @@ function renderPackages(){
         <div class="package-card-sub">${p.subtitle}</div>
       </div>
       <div class="package-card-body">
-        <div class="package-card-meta"><span>👥 ${p.persons}인 기준</span><span>🗓 ${p.nights}박${p.nights+1}일</span></div>
+        <div class="package-card-meta"><span>👥 ${p.persons}인 기준</span><span>🗓 ${p.nights}박${getPkgDisplayDays(p)}일</span></div>
         <ul class="package-highlights">${p.highlights.map(h=>`<li>${h}</li>`).join('')}</ul>
         <div class="package-card-cta">📋 일정표 보기</div>
       </div>
@@ -1798,7 +1806,7 @@ window.selectPackage = function(id){
   document.getElementById('itinerary-header').innerHTML = `
     <div class="badge2">${pkg.badge}</div>
     <h2>${pkg.title}</h2>
-    <div class="sub">${pkg.subtitle}<br>👥 ${pkg.persons}인 기준 · 🗓 ${pkg.nights}박${pkg.nights+1}일 (실제 인원·일정은 다음 화면에서 변경 가능)</div>
+    <div class="sub">${pkg.subtitle}<br>👥 ${pkg.persons}인 기준 · 🗓 ${pkg.nights}박${getPkgDisplayDays(pkg)}일 (실제 인원·일정은 다음 화면에서 변경 가능)</div>
   `;
 
   document.getElementById('itinerary-days').innerHTML = pkg.days.map(d=>`
@@ -1852,6 +1860,9 @@ function applyPackagePreset(pkg){
 
   // 여행유형 전환 (마진 산출 기준)
   tripType = pkg.tripType;
+
+  // 패키지 제목의 "n박m일" 표시 일수를 추출 (야간 귀국편 등으로 nights+1과 다를 수 있어 제목 기준으로 표시)
+  pkgDisplayDays = getPkgDisplayDays(pkg);
   document.querySelectorAll('#mot-bali-wrap .region-tab').forEach((el,i)=>{
     el.classList.toggle('active', (i===0 && tripType==='honeymoon') || (i===1 && tripType==='family'));
   });
@@ -1931,7 +1942,7 @@ window.copyResult = function(){
   if(!r) return;
   const lines = [];
   lines.push(`■ 마이온트래블 발리 견적 (${r.tripType==='honeymoon'?'허니문':'가족/일반여행'})`);
-  lines.push(`인원 ${r.persons}명 · ${r.nights}박${r.nights+1}일 · 환율 ${r.exchange.toLocaleString()}원`);
+  lines.push(`인원 ${r.persons}명 · ${r.nights}박${(pkgDisplayDays && pkgDisplayDays > r.nights) ? pkgDisplayDays : r.nights+1}일 · 환율 ${r.exchange.toLocaleString()}원`);
   lines.push('');
   r.rows.forEach(([label,usd])=>{
     lines.push(`${label}: ${fmtUSD(usd)} (${fmtKRW(usd*r.exchange)})`);
@@ -1996,7 +2007,7 @@ function buildPrintContentHtml(){
   return `
     <div class="pq-meta">
       <div><strong>여행유형</strong> : ${r.tripType==='honeymoon'?'💑 허니문':'👨‍👩‍👧‍👦 가족/일반여행'}</div>
-      <div><strong>인원</strong> : ${r.persons}명 &nbsp; | &nbsp; <strong>일정</strong> : ${r.nights}박${r.nights+1}일</div>
+      <div><strong>인원</strong> : ${r.persons}명 &nbsp; | &nbsp; <strong>일정</strong> : ${r.nights}박${(pkgDisplayDays && pkgDisplayDays > r.nights) ? pkgDisplayDays : r.nights+1}일</div>
       <div><strong>적용환율</strong> : ${r.exchange.toLocaleString()}원/USD &nbsp; | &nbsp; <strong>견적일자</strong> : ${dateStr}</div>
     </div>
     <table class="pq-table">
