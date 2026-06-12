@@ -325,7 +325,7 @@
   <div class="itinerary-days" id="itinerary-days"></div>
   <div class="itinerary-actions">
     <button class="btn btn-outline" onclick="backToPackages()">← 다른 일정 보기</button>
-    <button class="btn btn-primary" onclick="startWithPackage()">✅ 이 일정으로 견적 시작하기</button>
+    <button class="btn btn-primary" onclick="startWithPackage()">✅ 이 일정으로<br>견적 시작하기</button>
   </div>
 </div>
 
@@ -1342,17 +1342,10 @@ function buildPanel(){
   /* 2. 숙박 (호텔1 + 호텔2) */
   html += makeCard('🏨 숙박', buildHotelSectionHtml());
 
-  /* 3. 차량 & 가이드 */
-  const guideOptions = CATALOG.guide.map(g=>`<option value="${g.id}">${g.name}</option>`).join('');
+  /* 3. 차량 & 가이드 (가이드는 한국어 가이드 - 풀데이(8H)로 고정) */
   html += makeCard('🚐 차량 &amp; 가이드 (인원수 자동배정)', `
     <div id="vehicle-info" class="vehicle-info"></div>
-    <div class="form-row" style="margin-top:10px">
-      <div class="form-group" style="grid-column:1/-1">
-        <label class="form-label">가이드 종류</label>
-        <select id="guide-select" class="form-control" onchange="calc()">${guideOptions}</select>
-      </div>
-    </div>
-    <div id="guide-info" class="vehicle-info"></div>
+    <div id="guide-info" class="vehicle-info" style="margin-top:6px"></div>
   `);
 
   /* 4. 식사 */
@@ -1678,9 +1671,8 @@ async function calc(){
     };
   });
 
-  /* ── 가이드 선택값 ── */
-  const guideSel = document.getElementById('guide-select');
-  const guideId = guideSel ? guideSel.value : 'g01';
+  /* ── 가이드: 한국어 가이드 - 풀데이(8H)로 고정 ── */
+  const guideId = 'g01';
 
   /* ── 서버로 보낼 요청 데이터 (선택값만, 원가/마진 정보 없음) ── */
   const payload = {
@@ -1892,9 +1884,7 @@ function applyPackagePreset(pkg){
   updateHotelSelectedDisplay('1');
   updateHotelSelectedDisplay('2');
 
-  // 가이드
-  const guideSel = document.getElementById('guide-select');
-  if(guideSel) guideSel.value = guideId;
+  // 가이드: 한국어 가이드 - 풀데이(8H)로 고정 (선택 UI 없음)
 
   // 식사 수량
   Object.keys(preset.meals || {}).forEach(id=>{
@@ -1976,8 +1966,9 @@ function buildPrintContentHtml(){
   [r.hotel1, r.hotel2].filter(h=>h && h.applied).forEach(h=>{
     detailRows += `<tr><td>🏨 ${h.name} (${h.season}, ${h.nights}박×${h.rooms}룸)</td><td class="r">${fmtUSD(h.unitPrice)}</td><td class="r bold">${fmtKRW(h.cost*r.exchange)}</td></tr>`;
   });
-  detailRows += `<tr><td>🚐 차량비 (${r.vRule.type} × ${r.vdays}일)</td><td class="r">${fmtUSD(r.vCostUSD)}</td><td class="r bold">${fmtKRW(r.vCostUSD*r.exchange)}</td></tr>`;
-  detailRows += `<tr><td>🧑‍💼 가이드비 (${r.guideItem.name} × ${r.guideCount}명 × ${r.vdays}일)</td><td class="r">${fmtUSD(r.guideCostUSD)}</td><td class="r bold">${fmtKRW(r.guideCostUSD*r.exchange)}</td></tr>`;
+  /* 차량비 + 가이드비 합산 표시 */
+  const vgCostUSD = r.vCostUSD + r.guideCostUSD;
+  detailRows += `<tr><td>🚐 차량비+가이드비 (${r.vRule.type} · ${r.guideItem.name} × ${r.vdays}일)</td><td class="r">${fmtUSD(vgCostUSD)}</td><td class="r bold">${fmtKRW(vgCostUSD*r.exchange)}</td></tr>`;
   r.mealDetails.forEach(m=>{
     detailRows += `<tr><td>🍽 ${m.name} × ${m.cnt}</td><td class="r">${fmtUSD(m.cost)}</td><td class="r bold">${fmtKRW(m.cost*r.exchange)}</td></tr>`;
   });
@@ -2144,12 +2135,31 @@ window.refreshExchangeRate = async function(){
 };
 
 /* ════════════════════════════════════════════════════════════
+   부모 페이지(아임웹 iframe)로 실제 콘텐츠 높이 전달
+   - iframe 자체 스크롤(이중 스크롤) 제거용: 부모 페이지에서 이 메시지를
+     받아 iframe height를 동적으로 맞춰주면 내부 스크롤 없이
+     자연스럽게 페이지 스크롤만 사용하게 됨
+   ════════════════════════════════════════════════════════════ */
+function reportHeightToParent(){
+  const wrap = document.getElementById('mot-bali-wrap');
+  if(!wrap) return;
+  const h = wrap.scrollHeight;
+  try{ window.parent.postMessage({type:'mot-bali-resize', height:h}, '*'); }catch(e){}
+}
+window.addEventListener('resize', reportHeightToParent);
+if(typeof ResizeObserver !== 'undefined'){
+  const wrapEl = document.getElementById('mot-bali-wrap');
+  if(wrapEl) new ResizeObserver(reportHeightToParent).observe(wrapEl);
+}
+
+/* ════════════════════════════════════════════════════════════
    초기화
    ════════════════════════════════════════════════════════════ */
 renderPackages();
 buildPanel();
 calc();
 refreshExchangeRate();
+setTimeout(reportHeightToParent, 300);
 })();
 </script>
 <!-- /* ════════════════════════�                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   
