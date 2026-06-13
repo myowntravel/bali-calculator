@@ -394,6 +394,7 @@
         <button class="btn btn-outline" onclick="showPrintPreview()">🖨 견적서 미리보기 / 인쇄</button>
         <button class="btn btn-primary" onclick="copyResult()">📋 결과 복사</button>
         <button class="btn" style="background:#805ad5;color:#fff" onclick="saveAsImage()">📸 이미지 저장</button>
+        <button class="btn" style="background:#FEE500;color:#3C1E1E;font-weight:700" onclick="startKakaoInquiry()">💬 이 견적으로 예약/문의하기</button>
       </div>
     </div>
   </div>
@@ -1935,11 +1936,11 @@ function applyPackagePreset(pkg){
 }
 
 /* ════════════════════════════════════════════════════════════
-   결과 복사 (클립보드)
+   결과 텍스트 생성 (복사 / 카카오문의 공통 사용)
    ════════════════════════════════════════════════════════════ */
-window.copyResult = function(){
+function buildResultText(){
   const r = window._motBaliResult;
-  if(!r) return;
+  if(!r) return '';
   const lines = [];
   lines.push(`■ 마이온트래블 발리 견적 (${r.tripType==='honeymoon'?'허니문':'가족/일반여행'})`);
   lines.push(`인원 ${r.persons}명 · ${r.nights}박${(pkgDisplayDays && pkgDisplayDays > r.nights) ? pkgDisplayDays : r.nights+1}일 · 환율 ${r.exchange.toLocaleString()}원`);
@@ -1955,7 +1956,15 @@ window.copyResult = function(){
   lines.push(`항공료(1인): ${fmtKRW(r.airPer)}  /  항공료 합계: ${fmtKRW(r.airTotal)}`);
   lines.push(`────────────────`);
   lines.push(`최종 총 판매가: ${fmtKRW(r.grandFinal)}`);
-  const text = lines.join('\n');
+  return lines.join('\n');
+}
+
+/* ════════════════════════════════════════════════════════════
+   결과 복사 (클립보드)
+   ════════════════════════════════════════════════════════════ */
+window.copyResult = function(){
+  const text = buildResultText();
+  if(!text) return;
   if(navigator.clipboard && navigator.clipboard.writeText){
     navigator.clipboard.writeText(text).then(()=>alert('견적 결과가 클립보드에 복사되었습니다.'))
       .catch(()=>fallbackCopy(text));
@@ -1963,15 +1972,42 @@ window.copyResult = function(){
     fallbackCopy(text);
   }
 };
-function fallbackCopy(text){
+function fallbackCopy(text, okMsg){
+  okMsg = okMsg || '견적 결과가 클립보드에 복사되었습니다.';
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.position='fixed'; ta.style.opacity='0';
   document.body.appendChild(ta);
   ta.select();
-  try{ document.execCommand('copy'); alert('견적 결과가 클립보드에 복사되었습니다.'); }catch(e){ alert('복사에 실패했습니다.'); }
+  try{ document.execCommand('copy'); alert(okMsg); }catch(e){ alert('복사에 실패했습니다.'); }
   document.body.removeChild(ta);
 }
+
+/* ════════════════════════════════════════════════════════════
+   카카오채널 예약/문의 — 견적 내용 복사 후 채팅창 오픈
+   ════════════════════════════════════════════════════════════ */
+const KAKAO_CHANNEL_CHAT_URL = 'http://pf.kakao.com/_SpqlG/chat';
+
+window.startKakaoInquiry = function(){
+  const text = buildResultText();
+  if(!text){
+    alert('먼저 견적을 계산해주세요.');
+    return;
+  }
+  const inquiryText = text + '\n\n위 견적 내용으로 예약/문의 드립니다 :)';
+  const guideMsg = '견적 내용이 복사되었습니다!\n\n잠시 후 열리는 카카오채널 채팅창에서\n채팅 입력창을 꾹 눌러 "붙여넣기" 해주시면\n견적 내용이 그대로 전달됩니다 😊';
+
+  const openChat = () => window.open(KAKAO_CHANNEL_CHAT_URL, '_blank');
+
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(inquiryText)
+      .then(()=>{ alert(guideMsg); openChat(); })
+      .catch(()=>{ fallbackCopy(inquiryText, guideMsg); openChat(); });
+  } else {
+    fallbackCopy(inquiryText, guideMsg);
+    openChat();
+  }
+};
 
 /* ════════════════════════════════════════════════════════════
    인쇄 미리보기 / 인쇄 / 이미지 저장
