@@ -1330,6 +1330,10 @@ function buildPanel(){
   html += makeCard('📋 기본 정보', `
     <div class="form-row">
       <div class="form-group">
+        <label class="form-label">출발 날짜</label>
+        <input type="date" id="trip-start-date" class="form-control" value="${defaultTripStartDate()}" oninput="calc()">
+      </div>
+      <div class="form-group">
         <label class="form-label">인원수</label>
         <input type="number" id="persons" class="form-control" value="2" min="1" step="1" oninput="calc()">
       </div>
@@ -1440,13 +1444,6 @@ function buildHotelSectionHtml(){
           <div class="form-group">
             <label class="form-label">박수</label>
             <input type="number" id="hotel${n}-nights" class="form-control" value="${n==='1'?4:0}" min="0" step="1" oninput="calc()">
-          </div>
-          <div class="form-group">
-            <label class="form-label">시즌</label>
-            <select id="hotel${n}-season" class="form-control" onchange="calc()">
-              <option value="low">비수기</option>
-              <option value="high">성수기 (7-8월·12/25-1/1)</option>
-            </select>
           </div>
         </div>
         <div class="form-row" id="hotel${n}-custom-row" style="display:none">
@@ -1648,6 +1645,35 @@ window.renderSelectedOptions = function(prefix){
 };
 
 /* ════════════════════════════════════════════════════════════
+   출발 날짜 기반 성수기/비수기 자동 판정 유틸
+   - 성수기 기준: 7~8월, 12/25 ~ 1/1 (연말연시)
+   ════════════════════════════════════════════════════════════ */
+function getSeasonForDate(dateStr){
+  if(!dateStr) return 'low';
+  const d = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d.getTime())) return 'low';
+  const m   = d.getMonth() + 1; // 1~12
+  const day = d.getDate();
+  if(m === 7 || m === 8) return 'high';            // 7~8월
+  if(m === 12 && day >= 25) return 'high';         // 12/25~12/31
+  if(m === 1 && day <= 1) return 'high';           // 1/1
+  return 'low';
+}
+/* dateStr(YYYY-MM-DD)에 days일을 더한 날짜 문자열 반환 */
+function addDaysToDateStr(dateStr, days){
+  const d = new Date(dateStr + 'T00:00:00');
+  if(isNaN(d.getTime())) return dateStr;
+  d.setDate(d.getDate() + (Number(days) || 0));
+  return d.toISOString().slice(0,10);
+}
+/* 출발 날짜 입력 기본값: 오늘로부터 30일 후 */
+function defaultTripStartDate(){
+  const d = new Date();
+  d.setDate(d.getDate() + 30);
+  return d.toISOString().slice(0,10);
+}
+
+/* ════════════════════════════════════════════════════════════
    메인 계산 로직
    - 원가표·마진공식은 서버(Code_발리견적API.gs)에만 존재
    - 여기서는 선택값(payload)만 구성해 SECURE_API_URL로 전송하고,
@@ -1660,18 +1686,25 @@ async function calc(){
   const vdaysRaw = getV('vdays');
   const vdays    = vdaysRaw > 0 ? vdaysRaw : nights;
 
-  /* ── 호텔 (숙박1 + 숙박2) 선택값 수집 + 직접입력 행 표시 토글 ── */
+  /* ── 호텔 (숙박1 + 숙박2) 선택값 수집 + 직접입력 행 표시 토글 ──
+     시즌(성수기/비수기)은 더이상 사용자가 선택하지 않고,
+     출발 날짜를 기준으로 자동 판정한다.
+     - 호텔1 체크인 = 출발 날짜
+     - 호텔2 체크인 = 출발 날짜 + 호텔1 박수                       */
+  const tripStartDate = document.getElementById('trip-start-date')?.value || defaultTripStartDate();
   const hotelPayload = {};
+  let hotel1Nights = 0;
   ['1','2'].forEach(n=>{
     const sel       = document.getElementById('hotel'+n+'-select');
     const nightsEl  = document.getElementById('hotel'+n+'-nights');
-    const seasonEl  = document.getElementById('hotel'+n+'-season');
     const customRow = document.getElementById('hotel'+n+'-custom-row');
     if(!sel) return;
     const hotel = CATALOG.hotels.find(h=>h.id===sel.value);
     if(!hotel) return;
     const hn = Math.max(0, Math.round(parseFloat(nightsEl.value)) || 0);
-    const season = seasonEl.value;
+    const checkinDate = (n === '1') ? tripStartDate : addDaysToDateStr(tripStartDate, hotel1Nights);
+    const season = getSeasonForDate(checkinDate);
+    if(n === '1') hotel1Nights = hn;
     if(customRow) customRow.style.display = hotel.custom ? '' : 'none';
     hotelPayload['hotel'+n] = {
       id: sel.value,
@@ -1876,24 +1909,27 @@ function applyPackagePreset(pkg){
   hotel1Custom = 0;
   hotel2Custom = 0;
 
+  // 패널을 새로 빌드하기 전, 기존에 입력된 출발 날짜를 보존
+  const prevTripStartDate = document.getElementById('trip-start-date')?.value;
+
   // 패널을 새로 빌드한 뒤, DOM 값들을 프리셋으로 설정
   buildPanel();
+
+  if(prevTripStartDate) document.getElementById('trip-start-date').value = prevTripStartDate;
 
   document.getElementById('persons').value = pkg.persons;
   document.getElementById('nights').value  = pkg.nights;
   document.getElementById('vdays').value   = pkg.nights;
 
-  // 호텔 1 (필수)
+  // 호텔 1 (필수) — 시즌은 출발 날짜 기준으로 자동 판정되므로 별도 설정 불필요
   document.getElementById('hotel1-select').value = preset.hotel1.id;
   document.getElementById('hotel1-nights').value = preset.hotel1.nights;
-  document.getElementById('hotel1-season').value = preset.hotel1.season;
 
   // 호텔 2 (선택)
   const h2 = preset.hotel2;
   if(h2 && h2.id){
     document.getElementById('hotel2-select').value = h2.id;
     document.getElementById('hotel2-nights').value = h2.nights;
-    document.getElementById('hotel2-season').value = h2.season;
   } else {
     document.getElementById('hotel2-select').value = '';
     document.getElementById('hotel2-nights').value = 0;
