@@ -2278,6 +2278,10 @@ async function calc(){
     if(statusEl) statusEl.textContent = '⚠️ 견적 계산 서버 연결 실패 - 잠시 후 다시 시도해주세요';
   }
 }
+/* oninput="calc()" 등 인라인 이벤트 핸들러(전역 스코프)에서 호출 가능하도록 전역 등록
+   - 이게 없으면 출발 날짜/인원수/박수/항공료 등을 바꿔도 calc()가 호출되지 않아
+     (ReferenceError: calc is not defined) 견적 결과가 갱신되지 않는 버그가 발생함 */
+window.calc = calc;
 
 /* 서버가 반환한 계산 결과(r)를 화면에 렌더링 */
 function renderResult(r){
